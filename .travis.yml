@@ -1,3 +1,12 @@
 language: rust
 rust:
   - nightly
+deploy:
+  provider: codedeploy
+  access_key_id: AKIAJE4R64EUVXUXAV7Q
+  secret_access_key:
+    secure: oTTUznooBaP32yAT2r468al3R7GowMMfXNU1944a5QCsHLjfZ+1OLUehnn6F7Z6WQJXgOOU3KSaqvOy4voYAIN1Gxt2QznTSvYrtexMma77fICUxffWJtvvm2+KDcpA8Mh/67PqHTYgH/SgR5yxZtL+g9p0PK5epety5sELQe/2GgIcocE/FlpU3gDxk72QxU1zfWyVJuJBaswIxjifRCdWy6saT34tG2sxaAaA+iEjslBouVFQk3YNYIu3QVL3hd72GCXRD1PDGnm2lUlEcISVNrtVQdpT/W0JoAmgQ4CaY2sPerdk/b6KG38m4ek2FJjfcPExhD8k723d+g548fe8+d6B796nZWt8w52RLit24VQA5i9V+92q3qmD5YVrjyTa+Dl5Xsy0cFOvEl5ILC1zHST2yWn8LDv8PuzU+TQAMrME/s2BkVnadk0ER0hUSTROoYTv2tGULCyljH8GRRsX3StU04nvPcvbUAlCCrNYaIZI/s80Cj+3fkFwk+BaGKjzm6m+nd/Lx1bVwhyu7UOcJtec6Q4zWB8guF8Y6LlOk63J+bI1xNCg4hCWPZJgk49o+I1BzrkWVny6T6Ewm+yPTedLLRG0O3F3DMSo7uQX8UHQuUqyLKJHCIRa/duD9pYSfl/YSR47BecVRUgb/EkMJWNRG4qrSyJcZn6syCcQ=
+  application: HangryRiverHorse
+  deployment_group: HangryRiverHorse
+  on:
+    repo: excaliburHisSheath/hangry-river-horse
