@@ -10,3 +10,4 @@ deploy:
   deployment_group: HangryRiverHorse
   on:
     repo: excaliburHisSheath/hangry-river-horse
+    all_branches: true
