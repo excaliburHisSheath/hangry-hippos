@@ -1,6 +1,6 @@
 FROM ubuntu:12.04
 
-RUN pws
+RUN pwd
 RUN ls -al
 
 # Install zip and curl so that we can download and unzip the source repo.
