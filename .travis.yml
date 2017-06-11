@@ -9,6 +9,7 @@ deploy:
   region: us-east-1
   app: hangry-river-horse
   env: Sample-env-1
+  bucket_name: elasticbeanstalk-us-east-1-706915058092
   on:
     repo: excaliburHisSheath/hangry-river-horse
     branch: aws-codedeploy
