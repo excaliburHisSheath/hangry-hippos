@@ -26,4 +26,4 @@ EXPOSE 80 6767 6768 6769
 
 ENV ROCKET_ENV=staging
 
-CMD ["/hangry-river-horse-master/target/debug/hangry-hippos"]
+CMD cd /hangry-river-horse-master && ./target/debug/hangry-hippos
