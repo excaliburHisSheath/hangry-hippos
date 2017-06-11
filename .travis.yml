@@ -1,13 +1,14 @@
 language: rust
 rust:
-  - nightly
+- nightly
 deploy:
-  provider: codedeploy
-  access_key_id: AKIAJE4R64EUVXUXAV7Q
+  provider: elasticbeanstalk
+  access_key_id: AKIAJE4R64EUVXUXAV7
   secret_access_key:
-    secure: oTTUznooBaP32yAT2r468al3R7GowMMfXNU1944a5QCsHLjfZ+1OLUehnn6F7Z6WQJXgOOU3KSaqvOy4voYAIN1Gxt2QznTSvYrtexMma77fICUxffWJtvvm2+KDcpA8Mh/67PqHTYgH/SgR5yxZtL+g9p0PK5epety5sELQe/2GgIcocE/FlpU3gDxk72QxU1zfWyVJuJBaswIxjifRCdWy6saT34tG2sxaAaA+iEjslBouVFQk3YNYIu3QVL3hd72GCXRD1PDGnm2lUlEcISVNrtVQdpT/W0JoAmgQ4CaY2sPerdk/b6KG38m4ek2FJjfcPExhD8k723d+g548fe8+d6B796nZWt8w52RLit24VQA5i9V+92q3qmD5YVrjyTa+Dl5Xsy0cFOvEl5ILC1zHST2yWn8LDv8PuzU+TQAMrME/s2BkVnadk0ER0hUSTROoYTv2tGULCyljH8GRRsX3StU04nvPcvbUAlCCrNYaIZI/s80Cj+3fkFwk+BaGKjzm6m+nd/Lx1bVwhyu7UOcJtec6Q4zWB8guF8Y6LlOk63J+bI1xNCg4hCWPZJgk49o+I1BzrkWVny6T6Ewm+yPTedLLRG0O3F3DMSo7uQX8UHQuUqyLKJHCIRa/duD9pYSfl/YSR47BecVRUgb/EkMJWNRG4qrSyJcZn6syCcQ=
-  application: HangryRiverHorse
-  deployment_group: HangryRiverHorse
+    secure: tSM2vi2htoL39v/l1V5LeeVCg/CIKtBWhiNkFJOY+Fsp1vAeADN3fAm+xCjPn4PC/119XdbVD4BZYOASZco1ZGRgYX34h4GG+8jqvoS0We4E7s0sORqz8hhSiI5CaUQa5xLiEVLksCJlWsZANDEEiymO8vhIffjKiBuWkt+TpQbK6Tg0uwfVd1IHjUps0C22iAYeXkiW5vqulGrsUdrB1AjjMyEX6h0BclsMy0jgkkJ7KN+RuSBEX+/T89H9GLrbaVWJ7s+OV22BuKxaQNuHTVql6uejjsMIbhQjh9zeLfGWbxQs838Qm8hHeLvpMMA4rW5wBlZ2o4j0Pmgj3C1ktlh+LjRkbMSghgTKSm6yxU1whsKohPLx9mxTcfvZ5zrBHFgZ3iz20qJO8bFxJzWwgvdJvRAaTLmrFzZw7FrIRxeWzaIEKe0zAhEN9PYav06gdK+7579+94SUe6Gr9LYwp/5ttqzKQYpma96PQpAMaUWtSd9BuIeyNltgRiY3zL3VZ4K/MPQc/tI57RFBA+gulTjAJJg2qONywVLVVmCXAIMGhHOQGsaGWJVxBKevQDAsNTNqtAkmvqlEJL5CU+YhfjEpawFUzecNgCJ5o9LQox0dG+QXC3Qs+frj2EPWh8Z3/juSEfSRaS9XYhC3fPSFvaWB9hygXb/XzZM94XzE64o=
+  region: us-east-1
+  app: hangry-river-horse
+  env: Sample-env-1
   on:
     repo: excaliburHisSheath/hangry-river-horse
-    all_branches: true
+    branch: aws-codedeploy
