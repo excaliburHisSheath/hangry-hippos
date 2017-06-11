@@ -5,6 +5,7 @@ port = 6767
 [staging]
 address = "0.0.0.0"
 port = 80
+log = "normal"
 
 [production]
 address = "0.0.0.0"
