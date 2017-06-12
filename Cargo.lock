@@ -1,5 +1,5 @@
 [root]
-name = "hangry-hippos"
+name = "hangry-river-horse"
 version = "0.1.0"
 dependencies = [
  "rocket 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
