@@ -4,7 +4,7 @@ rust:
 
 before_deploy:
   - cargo install --root .
-  - zip -r hangry-river-horse-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip . -i "bin/*" -i "www/*"
+  - zip -r hangry-river-horse-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip . -x "target/*" -x ".git/*"
 
 deploy:
   provider: elasticbeanstalk
