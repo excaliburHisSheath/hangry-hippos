@@ -8,7 +8,7 @@ deploy:
     secure: 1W4x17W83to5Qc42fR0LE7N5gB1bJWmvuDYTQJcsjiPwZxSVnPcHiH9ax13zdoB8BfsjebqiEBSp1OZJJFT0ertyZT3fmSpJXBKvzILMWWhNcr+rrl8L6/I8PtR6fUTAY2NUeWgBRGV8kW3Ils8vlsqnPuv3RjMTHTwFIKawAV8YBcwBDrA0dVuv8VeYmtsgq23G1PDFLLopc9IwqQQn0mgDymc0aLzpMMTcN7MRL3w+FUp94P3BSSbu5o8Z5jRA0WK1cEZphTxD834tDGjwLbW1y3bX0Fx0JXA9HYF7rGeA8QSA6sH4UwEjmfZR3ZGGGbx/5UxiVHL1yx+BV9EUfUJ3rndM7DWTe09J0qddGuq6NREOIY32TjVD4pkUWtGfPYqqobOsCxRRLjI93fj/q11+7Nx1l3S6yzJM3C8D63oF06h77Al2fJ/yh2/WSeMzwTn/gStgMGkIwF9SaRXFRUoD1qcBmPeU/CHIQTW2sDUR+6wmb1f1hcI+u0MDHAs3w7vYeHgJJP798PNfKm35tp439FWAMvi080RZLVHkGQFodwCn3pZu6iYnHahRom8yXRPwlIDqIResXGm+3P1YP9Jq3sTUQoZRO9dNknfNOLv39n0y60c2OPrqWkmo/Gp3CwBzPYuoYCSpNDuR9h55OAToRoj8vUWQiodQrRNDqZ0=
   region: us-east-1
   app: hangry-river-horse
-  env: Sample-env-1
+  env: production
   bucket_name: elasticbeanstalk-us-east-1-706915058092
   on:
     repo: excaliburHisSheath/hangry-river-horse

@@ -5,7 +5,7 @@ let app = new Vue({
     }
 });
 
-let socket = new WebSocket('ws://localhost:6769');
+let socket = new WebSocket('ws://' + window.location.hostname + ':6769');
 socket.onmessage = (event) => {
     console.log('payload: ', event);
 

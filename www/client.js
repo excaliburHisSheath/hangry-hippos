@@ -31,7 +31,7 @@ function post(endpoint, payload, onResponse) {
 
 // Initialize WebSocket connetion without waiting for the DOM to be ready. I don't know if that's
 // actually a good idea, but whatevs.
-let socket = new WebSocket('ws://localhost:6768');
+let socket = new WebSocket('ws://' + window.location.hostname + ':6768');
 socket.onmessage = function(event) {
     console.log('socket event: ', event);
 };
