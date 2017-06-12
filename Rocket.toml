@@ -1,6 +1,6 @@
 [development]
 address = "localhost"
-port = 6767
+port = 8000
 
 [staging]
 address = "0.0.0.0"

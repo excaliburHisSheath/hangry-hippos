@@ -5,9 +5,6 @@
             "ContainerPort": "80"
         },
         {
-            "ContainerPort": "6767"
-        },
-        {
             "ContainerPort": "6768"
         },
         {

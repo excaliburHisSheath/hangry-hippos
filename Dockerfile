@@ -22,7 +22,7 @@ RUN unzip master.zip
 # Try building the repo using cargo.
 RUN cd hangry-river-horse-master && $HOME/.cargo/bin/cargo build
 
-EXPOSE 80 6767 6768 6769
+EXPOSE 80 6768 6769
 
 ENV ROCKET_ENV=staging
 
