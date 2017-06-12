@@ -1,6 +1,10 @@
 language: rust
 rust:
 - nightly
+
+before_deploy:
+  - cargo install --root .
+
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAIOLLQXCYHSGK2BVA
