@@ -4,7 +4,7 @@ rust:
 
 before_deploy:
   - cargo install --root .
-  - zip -r hangry-river-horse-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip . -x "target/*" -x ".git/*"
+  - zip -r build.zip . -x "target/*" -x ".git/*"
 
 deploy:
   provider: elasticbeanstalk
@@ -15,7 +15,7 @@ deploy:
   app: hangry-river-horse
   env: production
   bucket_name: elasticbeanstalk-us-east-1-706915058092
-  zip_file: hangry-river-horse-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
+  zip_file: build.zip
   skip_cleanup: true
   on:
     repo: excaliburHisSheath/hangry-river-horse
