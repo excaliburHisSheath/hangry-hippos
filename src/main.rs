@@ -50,8 +50,8 @@ fn main() {
     // Start websocket servers for broadcasting messages to host clients and player clients. The
     // resulting `Broadcaster<T>` objects are given to Rocket as managed state so that any API
     // endpoint can broadcast state changes as necessary.
-    let client_broadcaster = broadcast::start_server::<PlayerBroadcast>("localhost:6768");
-    let host_broadcaster = broadcast::start_server::<HostBroadcast>("localhost:6769");
+    let client_broadcaster = broadcast::start_server::<PlayerBroadcast>("0.0.0.0:6768");
+    let host_broadcaster = broadcast::start_server::<HostBroadcast>("0.0.0.0:6769");
 
     // Start the main Rocket application.
     rocket::ignite()
