@@ -6,4 +6,5 @@ EXPOSE 80 6768 6769
 
 ENV ROCKET_ENV=staging
 
-CMD ["/hangry-river-horse/bin/hangry-river-horse"]
+WORKDIR /hangry-river-horse
+CMD ["bin/hangry-river-horse"]
