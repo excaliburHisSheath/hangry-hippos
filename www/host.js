@@ -1,3 +1,5 @@
+console.log('I am a host instance');
+
 let app = new Vue({
     el: '#app',
     data: {
