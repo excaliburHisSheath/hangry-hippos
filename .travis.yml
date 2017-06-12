@@ -10,6 +10,7 @@ deploy:
   app: hangry-river-horse
   env: production
   bucket_name: elasticbeanstalk-us-east-1-706915058092
+  skip_cleanup: true
   on:
     repo: excaliburHisSheath/hangry-river-horse
     branch: aws-codedeploy
