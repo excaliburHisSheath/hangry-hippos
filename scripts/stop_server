@@ -1,2 +1,3 @@
 #!/bin/bash
 pkill hangry
+rm -rf /hangry-river-horse

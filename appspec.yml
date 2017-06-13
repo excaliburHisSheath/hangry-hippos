@@ -4,11 +4,11 @@ files:
   - source: /
     destination: /hangry-river-horse
 hooks:
-  BeforeInstall:
-    - location: scripts/start_server
-      timeout: 300
-      runas: root
   ApplicationStop:
     - location: scripts/stop_server
-      timeout: 300
+      timeout: 10
+      runas: root
+  ApplicationStart:
+    - location: scripts/start_server
+      timeout: 10
       runas: root
