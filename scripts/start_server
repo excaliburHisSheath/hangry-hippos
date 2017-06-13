@@ -1,2 +1,2 @@
 #!/bin/bash
-ROCKER_ENV=stage cd /hangry-river-horse && ./hangry-river-horse
+ROCKER_ENV=stage cd /hangry-river-horse && nohup ./hangry-river-horse &
