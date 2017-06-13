@@ -1,0 +1,16 @@
+version: 0.0
+os: linux
+files:
+  - source: /www
+    destination: /var/hangry-river-horse/
+  - source: /bin
+    destination: /var/hangry-river-horse/
+hooks:
+  BeforeInstall:
+    - location: scripts/start_server
+      timeout: 300
+      runas: root
+  ApplicationStop:
+    - location: scripts/stop_server
+      timeout: 300
+      runas: root

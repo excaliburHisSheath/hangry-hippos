@@ -1,22 +1,28 @@
 language: rust
 rust:
 - nightly
-
 before_deploy:
-  - cargo install --root .
-  - zip -r build.zip . -x "target/*" -x ".git/*"
-
+- cargo install --root .
+- zip -r latest.zip . -x "target/*" -x ".git/*"
+- mkdir -p dpl_cd_upload
+- mv latest.zip dpl_cd_upload/latest.zip
 deploy:
-  provider: elasticbeanstalk
-  access_key_id: AKIAIOLLQXCYHSGK2BVA
-  secret_access_key:
-    secure: 1W4x17W83to5Qc42fR0LE7N5gB1bJWmvuDYTQJcsjiPwZxSVnPcHiH9ax13zdoB8BfsjebqiEBSp1OZJJFT0ertyZT3fmSpJXBKvzILMWWhNcr+rrl8L6/I8PtR6fUTAY2NUeWgBRGV8kW3Ils8vlsqnPuv3RjMTHTwFIKawAV8YBcwBDrA0dVuv8VeYmtsgq23G1PDFLLopc9IwqQQn0mgDymc0aLzpMMTcN7MRL3w+FUp94P3BSSbu5o8Z5jRA0WK1cEZphTxD834tDGjwLbW1y3bX0Fx0JXA9HYF7rGeA8QSA6sH4UwEjmfZR3ZGGGbx/5UxiVHL1yx+BV9EUfUJ3rndM7DWTe09J0qddGuq6NREOIY32TjVD4pkUWtGfPYqqobOsCxRRLjI93fj/q11+7Nx1l3S6yzJM3C8D63oF06h77Al2fJ/yh2/WSeMzwTn/gStgMGkIwF9SaRXFRUoD1qcBmPeU/CHIQTW2sDUR+6wmb1f1hcI+u0MDHAs3w7vYeHgJJP798PNfKm35tp439FWAMvi080RZLVHkGQFodwCn3pZu6iYnHahRom8yXRPwlIDqIResXGm+3P1YP9Jq3sTUQoZRO9dNknfNOLv39n0y60c2OPrqWkmo/Gp3CwBzPYuoYCSpNDuR9h55OAToRoj8vUWQiodQrRNDqZ0=
-  region: us-east-1
-  app: hangry-river-horse
-  env: production
-  bucket_name: elasticbeanstalk-us-east-1-706915058092
-  zip_file: build.zip
+- provider: s3
+  access_key_id: AKIAJE4R64EUVXUXAV7
+  secret_access_key: &1
+    secure: ov4aQ3oyjBK0D3poRea6CMQkMgafu2kd+sxDm+7uG5dxdBw64WWtu1/NFuyi6b9cE4KGJAKZxDAaCc88Tyx9vCp0kmT/fWLEgmU4miXvlDQxy5qYENVv5BMx6/wAUFR0H3LV8hNIhWMCWAaL/nM+TSucrvhG7Ti47g34njDRwF4toE95XDugc4BW58BwYmPU4CrKcw0aPt2Hl8ZuK1w0XF3EfhFP9Tc0TF3IRf8qP21R35+XtYEGtQc7IZiLMhgtZSamFSRzCzNPHTlZTNjhOboA1tqk2tBpJFA5ysl37LF5T5SoCOIsDgEpHXK+hMweLB5tnW+OsNNdlJyIcuoljr0N5ApMDlyHECFuJN9rGGUdJIKrhh1bKxMeHknZ+nv7JZKSzPfOKSaWVOzZa5fIC8T00D8aghAB9NYcoiZ+Gbei5uM9Pil/tYGRpuumlsAPH8VyJ93/8T+hAOhGOR+XvegYc+XSNf7JCUzQkvfwKWflqO7jZguxaEIJxhn3+xvrnmj0lx7Cb2rGDfidmO19ofbf/wEXhAt1xvT7VkuEy/W9QVCcbinxQSLOUTEdiTRNxTZmrQFIkQhilJYRQv0EVv2aX3fetLUAt2IaKS4hgRQikmgrnYUbL3yOy9RhMnbmDeSgHBvfW0ytgoEbj3x409gFTd9IkfGm3KAjxjLxAt4=
+  local_dir: dpl_cd_upload
   skip_cleanup: true
-  on:
+  on: &2
     repo: excaliburHisSheath/hangry-river-horse
     branch: aws-codedeploy
+  bucket: hangry-river-horse
+- provider: codedeploy
+  access_key_id: AKIAJE4R64EUVXUXAV7
+  secret_access_key: *1
+  bucket: hangry-river-horse
+  key: latest.zip
+  bundle_type: zip
+  application: hangry-river-horse
+  deployment_group: all
+  on: *2
