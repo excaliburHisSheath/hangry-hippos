@@ -26,6 +26,6 @@ deploy:
   bucket: hangry-river-horse
   key: latest.zip
   bundle_type: zip
-  application: hangry-river-horse
-  deployment_group: all
+  application: DemoApplication
+  deployment_group: production
   on: *2
