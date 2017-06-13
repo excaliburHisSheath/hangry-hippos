@@ -1,2 +1,2 @@
 #!/bin/bash
-cd /var/hangry-river-horse && ./bin/hangry-river-horse
+cd /var/hangry-river-horse && ./hangry-river-horse
