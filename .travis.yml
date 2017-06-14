@@ -2,13 +2,16 @@ language: rust
 rust:
 - nightly
 script:
-- cargo build --release
 - cargo test
-after_success:
-- mv target/release/hangry-river-horse .
-- zip -r latest.zip . -x "target/*" -x ".git/*"
-- mkdir -p dpl_cd_upload
-- mv latest.zip dpl_cd_upload/latest.zip
+before_deploy:
+- >
+  if ! [ "$BEFORE_DEPLOY_RUN" ]; then
+    cargo build --release
+    mv target/release/hangry-river-horse .
+    zip -r latest.zip . -x "target/*" -x ".git/*"
+    mkdir -p dpl_cd_upload
+    mv latest.zip dpl_cd_upload/latest.zip
+  fi
 deploy:
 - provider: s3
   access_key_id: AKIAIOLLQXCYHSGK2BVA
@@ -18,7 +21,6 @@ deploy:
   skip_cleanup: true
   on: &2
     repo: excaliburHisSheath/hangry-river-horse
-    branch: aws-codedeploy
   bucket: hangry-river-horse
 - provider: codedeploy
   access_key_id: AKIAIOLLQXCYHSGK2BVA
