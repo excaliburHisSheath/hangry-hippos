@@ -1,3 +1,4 @@
 #!/bin/bash
 cd /hangry-river-horse
-ROCKER_ENV=stage nohup ./hangry-river-horse &
+chmod +x hangry-river-horse
+ROCKET_ENV=stage nohup ./hangry-river-horse > out.log 2> err.log &
