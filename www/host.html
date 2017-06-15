@@ -4,13 +4,24 @@
         <meta charset="utf-8">
         <title>Hangry Hangry Hippos</title>
         <!-- Development version of Vue.js, at some point use the release version. -->
+        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
         <script src="https://vuejs.org/js/vue.js"></script>
     </head>
 
     <body>
-        <div id="app">
-            <h1>Hangry Hangry Hippos</h1>
-            <p>This page should diplay the central screen for the game.</p>
+        <!--
+            Phaser root element. When we initialize Phaser, we tell it to create
+            its canvas inside `#phaser-root`.
+        -->
+        <div id="phaser-root"></div>
+
+
+        <!--
+            Vue root element. We use VueJS for rendering debug information.
+            Vue's functionality is only active within `#vue-root`. Debug
+            output is hidden when the `isDebugEnabled` flag is set to `false`.
+        -->
+        <div id="vue-root" v-if="isDebugEnabled">
             <ul>
                 <li v-for="score in scores">
                     {{ score.player }} has eaten {{ score.score }} colorful balls!
