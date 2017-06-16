@@ -111,7 +111,7 @@ pub struct PlayersResponse {
 /// This is used by new host connections to update thier display to match the current state of the
 /// game.
 #[get("/players")]
-pub fn get_scoreboard(scoreboard: State<Mutex<Scoreboard>>) -> JSON<PlayersResponse> {
+pub fn get_players(scoreboard: State<Mutex<Scoreboard>>) -> JSON<PlayersResponse> {
     // Clone the scoreboard so we can release the lock on it quickly.
     let scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned").clone();
 

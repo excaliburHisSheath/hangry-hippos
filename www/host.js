@@ -25,7 +25,7 @@ let players = [];
 
 function preload() {
     game.load.image('hippo', 'assets/hippo.jpg');
-    game.load.image('background', 'assets/background.jpg');
+    game.load.image('background', 'assets/backdrop.jpg');
 }
 
 function create() {

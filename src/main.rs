@@ -63,7 +63,7 @@ fn main() {
         .mount("/api", routes![
             api::register_player,
             api::feed_player,
-            api::get_scoreboard,
+            api::get_players,
         ])
         .manage(PlayerIdGenerator::new())
         .manage(host_broadcaster)
