@@ -14,9 +14,9 @@ pub type PlayerBroadcaster = Broadcaster<PlayerBroadcast>;
 /// A message to be broadcast to connected host clients.
 #[derive(Debug, Serialize)]
 pub enum HostBroadcast {
-    PlayerRegistered(PlayerId),
+    PlayerRegistered(PlayerData),
     PlayerScore {
-        player: PlayerId,
+        id: PlayerId,
         score: usize,
     },
 }

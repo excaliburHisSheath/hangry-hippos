@@ -1,10 +1,12 @@
+'use strict';
+
 // Initialize the VueJS app. This is used for debug rendering.
 let debug = new Vue({
     el: '#vue-root',
     data: {
         isDebugEnabled: true,
-        scores: [],
-    }
+        players: [],
+    },
 });
 
 // Initialize the Phaser game. Phaser provides most of the functionality that
@@ -18,6 +20,8 @@ let game = new Phaser.Game({
         create: create,
     },
 });
+
+let players = [];
 
 function preload() {
     game.load.image('hippo', 'assets/hippo.jpg');
@@ -36,19 +40,15 @@ function create() {
     sprite.height = 100;
 }
 
+// Setup a websocket to listen for updates from the server.
 let socket = new WebSocket('ws://' + window.location.hostname + ':6769');
 socket.onmessage = (event) => {
-    console.log('payload: ', event);
-
     // TODO: Do some validation on the payload data I guess.
     let payload = JSON.parse(event.data);
 
     if (payload['PlayerRegistered']) {
-        let player_id = payload['PlayerRegistered'];
-        debug.scores.push({
-            player: player_id,
-            score: 0,
-        });
+        let player = payload['PlayerRegistered'];
+        players.push(player);
     } else if (payload['PlayerScore']) {
         let info = payload['PlayerScore'];
 
@@ -56,14 +56,19 @@ socket.onmessage = (event) => {
         // then update their score, otherwise add them to the list.
         // TODO: We probaly shouldn't try to track score for players that haven't been registered,
         // since we wouldn't know there username.
-        let existing_score = debug.scores.find(score => score.player == info.player);
-        if (existing_score != null) {
-            existing_score.score = info.score;
-        } else {
-            debug.scores.push({
-                player: info.player,
-                score: info.score,
-            });
-        }
+        let existing_score = players.find(player => player.id === info.id);
+        assert(existing_score != null, 'Got a score for an unregistered player: ' + info.player);
+        existing_score.score = info.score;
     }
 };
+
+// When we first boot up we need to get the current list of players.
+get('/api/players', response => {
+    players = response['players'];
+
+    // Set the `debug.players` to be `players`, that way any changes to
+    // `players` will automatically be reflected in the debug information.
+    debug.players = players;
+
+    // TODO: Create a hippo for each player.
+});

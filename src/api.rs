@@ -32,7 +32,10 @@ pub fn register_player(
     }
 
     // Broadcast to all hosts that a new player has joined.
-    broadcaster.send(HostBroadcast::PlayerRegistered(player_id));
+    broadcaster.send(HostBroadcast::PlayerRegistered(PlayerData {
+        id: player_id,
+        score: 0,
+    }));
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
@@ -84,7 +87,7 @@ pub fn feed_player(
 
     // Broadcast the new score to all hosts.
     broadcaster.send(HostBroadcast::PlayerScore {
-        player: player_id,
+        id: player_id,
         score: score,
     });
 
