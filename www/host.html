@@ -10,15 +10,35 @@
         <!-- Our super cool helper scripts. -->
         <script src="assert.js"></script>
         <script src="request.js"></script>
+
+        <link href="host.css" rel="stylesheet"></link>
     </head>
 
     <body>
         <div id="vue-root">
-            <ul>
-                <li v-for="player in players">
-                    {{ player.id }} has eaten {{ player.score }} colorful balls!
-                </li>
-            </ul>
+            <div id="top-side" class="horizontal-side">
+                <div class="hippo" v-for="hippo in topHippos">
+                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
+                </div>
+            </div>
+
+            <div id="right-side" class="vertical-side">
+                <div class="hippo" v-for="hippo in rightHippos">
+                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
+                </div>
+            </div>
+
+            <div id="bottom-side" class="horizontal-side">
+                <div class="hippo" v-for="hippo in bottomHippos">
+                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
+                </div>
+            </div>
+
+            <div id="left-side" class="vertical-side">
+                <div class="hippo" v-for="hippo in leftHippos">
+                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
+                </div>
+            </div>
         </div>
 
         <!-- Load script for the host. -->

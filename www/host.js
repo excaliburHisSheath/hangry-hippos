@@ -4,12 +4,26 @@
 let app = new Vue({
     el: '#vue-root',
     data: {
+        // Keep a list of all players, and a map for looking players up by ID.
         players: [],
         playerMap: {},
+
+        // Track which hippos should be on each side of the screen.
+        topHippos: [],
+        rightHippos: [],
+        bottomHippos: [],
+        leftHippos: [],
     },
 });
 
-let players = [];
+// Helpers to allow us to place hippos in clockwise order.
+let sides = [
+    app.topHippos,
+    app.rightHippos,
+    app.bottomHippos,
+    app.leftHippos,
+];
+let currentSide = 0;
 
 // Setup a websocket to listen for updates from the server.
 let socket = new WebSocket('ws://' + window.location.hostname + ':6769');
@@ -21,6 +35,11 @@ socket.onmessage = (event) => {
         let player = payload['PlayerRegistered'];
         app.players.push(player);
         app.playerMap[player.id] = player;
+
+        sides[currentSide].push({
+            player: player,
+        });
+        currentSide = (currentSide + 1) % 4;
     } else if (payload['PlayerScore']) {
         let info = payload['PlayerScore'];
 
@@ -38,5 +57,10 @@ get('/api/players', response => {
     // Add players to the player map, so we can find them by ID.
     for (let player of app.players) {
         app.playerMap[player.id] = player;
+
+        sides[currentSide].push({
+            player: player,
+        });
+        currentSide = (currentSide + 1) % 4;
     }
 });

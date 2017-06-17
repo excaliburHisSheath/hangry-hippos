@@ -1,0 +1,42 @@
+#top-side {
+    position: absolute;
+    top: 0;
+
+    flex-direction: row;
+}
+
+#right-side {
+    position: absolute;
+    right: 0;
+
+    flex-direction: column;
+}
+
+#bottom-side {
+    position: absolute;
+    bottom: 0;
+
+    flex-direction: row-reverse;
+}
+
+#left-side {
+    position: absolute;
+    left: 0;
+
+    flex-direction: column-reverse;
+}
+
+.horizontal-side, .vertical-side {
+    display: flex;
+    justify-content: space-around;
+}
+
+.horizontal-side {
+    width: 100%;
+    height: auto;
+}
+
+.vertical-side {
+    height: 100%;
+    width: auto;
+}
