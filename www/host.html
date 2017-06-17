@@ -17,27 +17,39 @@
     <body>
         <div id="vue-root">
             <div id="top-side" class="horizontal-side">
-                <div class="hippo" v-for="hippo in topHippos">
-                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
-                </div>
+                <hippo-head
+                    v-for="hippo in topHippos"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                >
+                </hippo-head>
             </div>
 
             <div id="right-side" class="vertical-side">
-                <div class="hippo" v-for="hippo in rightHippos">
-                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
-                </div>
+                <hippo-head
+                    v-for="hippo in rightHippos"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                >
+                </hippo-head>
             </div>
 
             <div id="bottom-side" class="horizontal-side">
-                <div class="hippo" v-for="hippo in bottomHippos">
-                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
-                </div>
+                <hippo-head
+                    v-for="hippo in bottomHippos"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                >
+                </hippo-head>
             </div>
 
             <div id="left-side" class="vertical-side">
-                <div class="hippo" v-for="hippo in leftHippos">
-                    {{ hippo.player.id }} has eaten {{ hippo.player.score }} balls!
-                </div>
+                <hippo-head
+                    v-for="hippo in leftHippos"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                >
+                </hippo-head>
             </div>
         </div>
 

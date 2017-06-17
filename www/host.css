@@ -40,3 +40,9 @@
     height: 100%;
     width: auto;
 }
+
+.hippo-head {
+    /* TODO: Can we make this scale better? */
+    width: 100px;
+    height: 100px;
+}
