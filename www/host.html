@@ -3,12 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title>Hangry Hangry Hippos</title>
-        <!-- Development version of Vue.js, at some point use the release version. -->
-        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
-        <script src="https://vuejs.org/js/vue.js"></script>
 
-        <!-- Latest version of Phaser CE. -->
-        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
+        <!-- Development version of Vue.js, at some point use the release version. -->
+        <script src="https://vuejs.org/js/vue.js"></script>
 
         <!-- Our super cool helper scripts. -->
         <script src="assert.js"></script>
@@ -16,19 +13,7 @@
     </head>
 
     <body>
-        <!--
-            Phaser root element. When we initialize Phaser, we tell it to create
-            its canvas inside `#phaser-root`.
-        -->
-        <div id="phaser-root"></div>
-
-
-        <!--
-            Vue root element. We use VueJS for rendering debug information.
-            Vue's functionality is only active within `#vue-root`. Debug
-            output is hidden when the `isDebugEnabled` flag is set to `false`.
-        -->
-        <div id="vue-root" v-if="isDebugEnabled">
+        <div id="vue-root">
             <ul>
                 <li v-for="player in players">
                     {{ player.id }} has eaten {{ player.score }} colorful balls!
