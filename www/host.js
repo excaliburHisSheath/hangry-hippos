@@ -17,14 +17,14 @@ let app = new Vue({
 });
 
 Vue.component('hippo-head', {
-    props: ['name', 'score'],
+    props: ['name', 'score', 'id'],
     template: `
     <div class="hippo-head">
         <div class="hippo-text">
             <div class="hippo-name">{{ name }}</div>
             <div class="hippo-score">Score: {{ score }}</div>
         </div>
-        <img src="assets/hippo.jpg" class="hippo-head-image">
+        <img src="assets/hippo.jpg" class="hippo-head-image" :id="id">
     </div>
     `,
 });
@@ -60,6 +60,10 @@ socket.onmessage = (event) => {
         assert(player != null, 'Unable to find player for ID: ' + info.id);
 
         player.score = info.score;
+
+        // Animate the hippo head to match the score increase.
+        let element = document.getElementById(player.id);
+        TweenMax.fromTo(element, .2, { right: 0 }, { right: '100px', repeat: 1, yoyo: true, overwrite: 'none' });
     }
 };
 

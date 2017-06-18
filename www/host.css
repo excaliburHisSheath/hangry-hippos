@@ -79,6 +79,9 @@ body {
     /* TODO: Can we make this scale better? */
     width: 100px;
     height: 100px;
+
+    /* Make the position relative so we can tween its position with top, right, left, bottom. */
+    position: relative;
 }
 
 .hippo-text {

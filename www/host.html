@@ -7,6 +7,9 @@
         <!-- Development version of Vue.js, at some point use the release version. -->
         <script src="https://vuejs.org/js/vue.js"></script>
 
+        <!-- Greensock JS Animation Platform. -->
+        <script src="greensock-js/src/minified/TweenMax.min.js"></script>
+
         <!-- Our super cool helper scripts. -->
         <script src="assert.js"></script>
         <script src="request.js"></script>
@@ -22,6 +25,7 @@
                     :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
                 ></hippo-head>
             </div>
 
@@ -31,6 +35,7 @@
                     :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
                 >
                 </hippo-head>
             </div>
@@ -41,6 +46,7 @@
                     :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
                 >
                 </hippo-head>
             </div>
@@ -51,6 +57,7 @@
                     :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
                 >
                 </hippo-head>
             </div>
