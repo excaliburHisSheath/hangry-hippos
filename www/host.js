@@ -19,10 +19,12 @@ let app = new Vue({
 Vue.component('hippo-head', {
     props: ['name', 'score'],
     template: `
-    <div>
-        <div class="hippo-name">{{ name }}</div>
-        <div class="hippo-score">Score: {{ score }}</div>
-        <img src="assets/hippo.jpg" class="hippo-head">
+    <div class="hippo-head">
+        <div class="hippo-text">
+            <div class="hippo-name">{{ name }}</div>
+            <div class="hippo-score">Score: {{ score }}</div>
+        </div>
+        <img src="assets/hippo.jpg" class="hippo-head-image">
     </div>
     `,
 });

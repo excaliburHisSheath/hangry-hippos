@@ -19,15 +19,16 @@
             <div id="top-side" class="horizontal-side">
                 <hippo-head
                     v-for="hippo in topHippos"
+                    :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
-                >
-                </hippo-head>
+                ></hippo-head>
             </div>
 
             <div id="right-side" class="vertical-side">
                 <hippo-head
                     v-for="hippo in rightHippos"
+                    :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
                 >
@@ -37,6 +38,7 @@
             <div id="bottom-side" class="horizontal-side">
                 <hippo-head
                     v-for="hippo in bottomHippos"
+                    :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
                 >
@@ -46,6 +48,7 @@
             <div id="left-side" class="vertical-side">
                 <hippo-head
                     v-for="hippo in leftHippos"
+                    :key="hippo.player.id"
                     v-bind:name="'TODO NAME ME'"
                     v-bind:score="hippo.player.score"
                 >

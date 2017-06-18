@@ -1,3 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo');
+
+body {
+    /* Remove the default padding around the edge of the screen. */
+    margin: 0;
+    padding: 0;
+
+    /* Make sure scroll bars never show up, and the game is always full-screen. */
+    overflow: hidden;
+
+    font-family: 'Baloo', cursive;
+}
+
+#vue-root {
+    width: 100vw;
+    height: 100vh;
+}
+
 #top-side {
     position: absolute;
     top: 0;
@@ -29,20 +47,57 @@
 .horizontal-side, .vertical-side {
     display: flex;
     justify-content: space-around;
+    flex-wrap: nowrap;
 }
 
 .horizontal-side {
     width: 100%;
     height: auto;
+
+    box-sizing: border-box;
+    padding: 0 100px; /* Horizontal margins should match hippo head size. */
 }
 
 .vertical-side {
     height: 100%;
     width: auto;
+
+    box-sizing: border-box;
+    padding: 100px 0; /* Vertical margins should match hippo head size. */
+}
+
+.side-contents {
+    width: 100%;
+    height: 100%;
 }
 
 .hippo-head {
+    height: 100px;
+}
+
+.hippo-head-image {
     /* TODO: Can we make this scale better? */
     width: 100px;
     height: 100px;
+}
+
+.hippo-text {
+    position: absolute;
+}
+
+#top-side .hippo-text {
+    top: 100px;
+}
+
+#right-side .hippo-text {
+    right: 100px;
+    width: auto;
+}
+
+#bottom-side .hippo-text {
+    bottom: 100px;
+}
+
+#left-side .hippo-text {
+    left: 100px;
 }
