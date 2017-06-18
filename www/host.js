@@ -1,18 +1,23 @@
 'use strict';
 
+const TOP_SIDE = 0;
+const RIGHT_SIDE = 1;
+const BOTTOM_SIDE = 2;
+const LEFT_SIDE = 3;
+
 // Initialize the VueJS app. This is used for app rendering.
 let app = new Vue({
     el: '#vue-root',
     data: {
-        // Keep a list of all players, and a map for looking players up by ID.
-        players: [],
-        playerMap: {},
-
         // Track which hippos should be on each side of the screen.
         topHippos: [],
         rightHippos: [],
         bottomHippos: [],
         leftHippos: [],
+
+        // Keep a map to allow us ot lookup hippos by player ID. The hippos keep a reference to
+        // their player so this also allows us to lookup players by ID.
+        hippoMap: {},
     },
 });
 
@@ -46,38 +51,79 @@ socket.onmessage = (event) => {
 
     if (payload['PlayerRegistered']) {
         let player = payload['PlayerRegistered'];
-        app.players.push(player);
-        app.playerMap[player.id] = player;
-
-        sides[currentSide].push({
-            player: player,
-        });
-        currentSide = (currentSide + 1) % 4;
+        registerPlayer(player);
     } else if (payload['PlayerScore']) {
         let info = payload['PlayerScore'];
 
-        let player = app.playerMap[info.id];
-        assert(player != null, 'Unable to find player for ID: ' + info.id);
+        let hippo = app.hippoMap[info.id];
+        assert(hippo != null, 'Unable to find hippo for ID: ' + info.id);
 
-        player.score = info.score;
+        hippo.player.score = info.score;
 
         // Animate the hippo head to match the score increase.
-        let element = document.getElementById(player.id);
-        TweenMax.fromTo(element, .2, { right: 0 }, { right: '100px', repeat: 1, yoyo: true, overwrite: 'none' });
+        let element = document.getElementById(hippo.player.id);
+        switch (hippo.side) {
+            case TOP_SIDE: {
+                TweenMax.fromTo(
+                    element,
+                    .2,
+                    { top: 0 },
+                    { top: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
+                );
+            } break;
+
+            case RIGHT_SIDE: {
+                TweenMax.fromTo(
+                    element,
+                    .2,
+                    { right: 0 },
+                    { right: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
+                );
+            } break;
+
+            case BOTTOM_SIDE: {
+                TweenMax.fromTo(
+                    element,
+                    .2,
+                    { bottom: 0 },
+                    { bottom: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
+                );
+            } break;
+
+            case LEFT_SIDE: {
+                TweenMax.fromTo(
+                    element,
+                    .2,
+                    { left: 0 },
+                    { left: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
+                );
+            } break;
+
+            default: throw new Error('Unrecognized hippo side: ' + hippo.side);
+        }
     }
 };
 
 // When we first boot up we need to get the current list of players.
 get('/api/players', response => {
-    app.players = response['players'];
+    let players = response['players'];
+    assert(players != null, '/api/players response was missing a "players" member');
 
     // Add players to the player map, so we can find them by ID.
-    for (let player of app.players) {
-        app.playerMap[player.id] = player;
-
-        sides[currentSide].push({
-            player: player,
-        });
-        currentSide = (currentSide + 1) % 4;
+    for (let player of players) {
+        registerPlayer(player);
     }
 });
+
+function registerPlayer(player) {
+    let hippo = {
+        player: player,
+        side: currentSide,
+    };
+
+    assert(app.hippoMap[player.id] == null, 'Hippo already exists for ID: ' + player.id);
+    app.hippoMap[player.id] = hippo;
+    sides[currentSide].push(hippo);
+
+    currentSide = (currentSide + 1) % 4;
+}
