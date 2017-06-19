@@ -4,8 +4,14 @@
         <meta charset="utf-8">
         <title>Hangry Hangry Hippos</title>
         <!-- Development version of Vue.js, at some point use the release version. -->
-        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
         <script src="https://vuejs.org/js/vue.js"></script>
+
+        <!-- Latest version of Phaser CE. -->
+        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
+
+        <!-- Our super cool helper scripts. -->
+        <script src="assert.js"></script>
+        <script src="request.js"></script>
 
         <!-- Favicons in all shapes and colors. -->
         <link rel="apple-touch-icon" sizes="57x57" href="assets/favicon/apple-icon-57x57.png">
@@ -42,8 +48,8 @@
         -->
         <div id="vue-root" v-if="isDebugEnabled">
             <ul>
-                <li v-for="score in scores">
-                    {{ score.player }} has eaten {{ score.score }} colorful balls!
+                <li v-for="player in players">
+                    {{ player.id }} has eaten {{ player.score }} colorful balls!
                 </li>
             </ul>
         </div>
