@@ -1,3 +1,5 @@
+'use strict';
+
 // Initialize Vue.js with some info I guess.
 let app = new Vue({
     el: '#app-root',
@@ -5,29 +7,6 @@ let app = new Vue({
         id: null,
     }
 });
-
-function get(endpoint, onResponse) {
-    let request = new XMLHttpRequest();
-    request.addEventListener('load', () => {
-        // TODO: Check the status code and handle any errors.
-        let response = JSON.parse(request.response);
-        onResponse(response);
-    });
-    request.open('GET', endpoint);
-    request.send();
-}
-
-function post(endpoint, payload, onResponse) {
-    let request = new XMLHttpRequest();
-    request.addEventListener('load', () => {
-        // TODO: Check the status code and handle any errors.
-        let response = JSON.parse(request.response);
-        onResponse(response);
-    });
-    request.open('POST', endpoint);
-    request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    request.send(JSON.stringify(payload));
-}
 
 // Initialize WebSocket connetion without waiting for the DOM to be ready. I don't know if that's
 // actually a good idea, but whatevs.
@@ -46,7 +25,7 @@ socket.onclose = function() {
 };
 
 // Register the player with the backend.
-get('api/register-player', response => {
+get('/api/register-player', response => {
     console.log('Registration result: ', response)
     app.id = response.id;
 });
@@ -57,7 +36,7 @@ function feedMe() {
     let payload = {
         player: app.id,
     };
-    post('api/feed-me', payload, response => {
+    post('/api/feed-me', payload, response => {
         console.log('feed-me response: ', response);
     });
 }
