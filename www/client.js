@@ -1,9 +1,21 @@
 // Initialize Vue.js with some info I guess.
 let app = new Vue({
     el: '#app-root',
+
     data: {
         id: null,
-    }
+    },
+
+    methods: {
+        feedMe: function () {
+            let payload = {
+                player: this.id,
+            };
+            post('api/feed-me', payload, response => {
+                console.log('feed-me response: ', response);
+            });
+        },
+    },
 });
 
 function get(endpoint, onResponse) {
@@ -47,17 +59,6 @@ socket.onclose = function() {
 
 // Register the player with the backend.
 get('api/register-player', response => {
-    console.log('Registration result: ', response)
+    console.log('Registration result: ', response);
     app.id = response.id;
 });
-
-// Callback for "Feed Me" button. Sends a message to the backend notifying that
-// a hippo has been fed.
-function feedMe() {
-    let payload = {
-        player: app.id,
-    };
-    post('api/feed-me', payload, response => {
-        console.log('feed-me response: ', response);
-    });
-}

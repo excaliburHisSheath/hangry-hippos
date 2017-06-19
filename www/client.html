@@ -3,31 +3,29 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
 
-        <title>Hangry Hangry Hippos Client</title>
+        <title>Hangry River Horse</title>
 
         <!-- Development version of Vue.js, at some point use the release version. -->
         <script src="https://vuejs.org/js/vue.js"></script>
-        <style>
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity .5s
-        }
-        .fade-enter, .fade-leave-to {
-            opacity: 0
-        }
-        </style>
+
+        <!-- Greensock Animation Platform -->
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+
+        <link href="client.css" rel="stylesheet">
     </head>
 
     <body>
-        <div id="app-root">
-            <h1>Hangry Hangry Hippos Client</h1>
-            <p>These hippos are hangry, and the only thing they can satisfy them is colorful balls!</p>
-            <transition name="fade">
-                <div v-if="id">
-                    Player has registered with ID {{ id }}.
-                </div>
-            </transition>
-            <button onclick="feedMe()">Feed Me!</button>
+        <div id="app-root" v-on:click="feedMe">
+            <h1>Hangry River Horse</h1>
+            <div>These hippos are hangry, and the only thing they can satisfy them is colorful balls!</div>
+
+            <div id="centered-text">
+                <div>You are player {{ id }}</div>
+                <div id="tap-text">Tap anywhere to feed your hippo!</div>
+                <div id="score-text">You have {{ score }} balls!</div>
+            </div>
         </div>
 
         <!-- Load script for the client. -->
