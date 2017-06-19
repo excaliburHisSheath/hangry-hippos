@@ -1,6 +1,6 @@
 // Initialize Vue.js with some info I guess.
 let app = new Vue({
-    el: '#app',
+    el: '#app-root',
     data: {
         id: null,
     }
