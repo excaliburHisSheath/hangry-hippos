@@ -14,8 +14,18 @@ let app = new Vue({
             let payload = {
                 player: this.id,
             };
+
+            // Animate the text in the center of the screen to give the user some feedback when
+            // they tap.
+            TweenMax.fromTo(
+                '#centered-text',
+                0.1,
+                { scale: 1 },
+                { scale: 1.2, yoyo: true, repeat: 1 },
+            );
+
             post('api/feed-me', payload, response => {
-                console.log('feed-me response: ', response);
+                this.score = response.score;
             });
         },
     },
