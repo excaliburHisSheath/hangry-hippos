@@ -1,9 +1,12 @@
+'use strict';
+
 // Initialize Vue.js with some info I guess.
 let app = new Vue({
     el: '#app-root',
 
     data: {
         id: null,
+        score: 0,
     },
 
     methods: {
@@ -17,29 +20,6 @@ let app = new Vue({
         },
     },
 });
-
-function get(endpoint, onResponse) {
-    let request = new XMLHttpRequest();
-    request.addEventListener('load', () => {
-        // TODO: Check the status code and handle any errors.
-        let response = JSON.parse(request.response);
-        onResponse(response);
-    });
-    request.open('GET', endpoint);
-    request.send();
-}
-
-function post(endpoint, payload, onResponse) {
-    let request = new XMLHttpRequest();
-    request.addEventListener('load', () => {
-        // TODO: Check the status code and handle any errors.
-        let response = JSON.parse(request.response);
-        onResponse(response);
-    });
-    request.open('POST', endpoint);
-    request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    request.send(JSON.stringify(payload));
-}
 
 // Initialize WebSocket connetion without waiting for the DOM to be ready. I don't know if that's
 // actually a good idea, but whatevs.

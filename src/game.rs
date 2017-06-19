@@ -57,3 +57,13 @@ impl PlayerIdGenerator {
 }
 
 pub type Scoreboard = HashMap<PlayerId, usize>;
+
+/// The current state for a single player.
+#[derive(Debug, Serialize)]
+pub struct PlayerData {
+    /// A unique identifier for the player.
+    pub id: PlayerId,
+
+    /// The player's current score.
+    pub score: usize,
+}

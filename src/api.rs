@@ -10,7 +10,7 @@ use std::sync::*;
 #[derive(Debug, Serialize)]
 pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
-    id: PlayerId,
+    pub id: PlayerId,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -32,7 +32,10 @@ pub fn register_player(
     }
 
     // Broadcast to all hosts that a new player has joined.
-    broadcaster.send(HostBroadcast::PlayerRegistered(player_id));
+    broadcaster.send(HostBroadcast::PlayerRegistered(PlayerData {
+        id: player_id,
+        score: 0,
+    }));
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
@@ -44,7 +47,7 @@ pub fn register_player(
 #[derive(Debug, Deserialize)]
 pub struct FeedPlayerRequest {
     /// The `PlayerId` for the player that clicked their "Feed Me" button.
-    player: PlayerId,
+    pub player: PlayerId,
 }
 
 /// The response sent back from the `/feed-me` endpoint.
@@ -84,7 +87,7 @@ pub fn feed_player(
 
     // Broadcast the new score to all hosts.
     broadcaster.send(HostBroadcast::PlayerScore {
-        player: player_id,
+        id: player_id,
         score: score,
     });
 
@@ -92,6 +95,29 @@ pub fn feed_player(
     Ok(JSON(FeedPlayerResponse {
         score: score,
     }))
+}
+
+/// The response sent back from the `/scoreboard` endpoint.
+///
+/// Contains the list of current players and all information about each player, useful for giving
+/// new hosts the current state of the game.
+#[derive(Debug, Serialize)]
+pub struct PlayersResponse {
+    pub players: Vec<PlayerData>,
+}
+
+/// Returns a list of players and their scores.
+///
+/// This is used by new host connections to update thier display to match the current state of the
+/// game.
+#[get("/players")]
+pub fn get_players(scoreboard: State<Mutex<Scoreboard>>) -> JSON<PlayersResponse> {
+    // Clone the scoreboard so we can release the lock on it quickly.
+    let scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned").clone();
+
+    let players = scoreboard.iter().map(|(&id, &score)| PlayerData { id, score }).collect();
+
+    JSON(PlayersResponse { players })
 }
 
 /// The error type for an API requests that can fail.
