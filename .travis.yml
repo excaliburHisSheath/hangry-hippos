@@ -4,10 +4,10 @@ rust:
 cache: cargo
 script:
 - cargo test
+- if [ "$TRAVIS_BRANCH" = "master" ]; then cargo build --release; fi
 before_deploy:
 - >
   if ! [ "$BEFORE_DEPLOY_RUN" ]; then
-    cargo build --release
     mv target/release/hangry-river-horse .
     zip -r latest.zip . -x "target/*" -x ".git/*"
     mkdir -p dpl_cd_upload
