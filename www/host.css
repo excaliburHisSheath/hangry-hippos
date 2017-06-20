@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo');
+
+body {
+    /* Remove the default padding around the edge of the screen. */
+    margin: 0;
+    padding: 0;
+
+    /* Make sure scroll bars never show up, and the game is always full-screen. */
+    overflow: hidden;
+
+    font-family: 'Baloo', cursive;
+}
+
+#vue-root {
+    width: 100vw;
+    height: 100vh;
+}
+
+#top-side {
+    position: absolute;
+    top: 0;
+
+    flex-direction: row;
+}
+
+#right-side {
+    position: absolute;
+    right: 0;
+
+    flex-direction: column;
+}
+
+#bottom-side {
+    position: absolute;
+    bottom: 0;
+
+    flex-direction: row-reverse;
+}
+
+#left-side {
+    position: absolute;
+    left: 0;
+
+    flex-direction: column-reverse;
+}
+
+.horizontal-side, .vertical-side {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+}
+
+.horizontal-side {
+    width: 100%;
+    height: auto;
+
+    box-sizing: border-box;
+    padding: 0 100px; /* Horizontal margins should match hippo head size. */
+}
+
+.horizontal-side .hippo-text {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.vertical-side {
+    height: 100%;
+    width: auto;
+
+    box-sizing: border-box;
+    padding: 100px 0; /* Vertical margins should match hippo head size. */
+}
+
+.vertical-side .hippo-text {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.side-contents {
+    width: 100%;
+    height: 100%;
+}
+
+.hippo-head {
+    position: relative;
+    height: 100px;
+    text-align: center;
+}
+
+.hippo-head-image {
+    /* TODO: Can we make this scale better? */
+    width: 100px;
+    height: 100px;
+
+    /* Make the position relative so we can tween its position with top, right, left, bottom. */
+    position: relative;
+}
+
+.hippo-text {
+    position: absolute;
+    white-space: nowrap;
+}
+
+#top-side .hippo-text {
+    top: 200px;
+}
+
+#right-side .hippo-text {
+    right: 200px;
+}
+
+#right-side .hippo-head-image {
+    transform: rotate(90deg);
+}
+
+#bottom-side .hippo-text {
+    bottom: 200px;
+}
+
+#bottom-side .hippo-head-image {
+    transform: rotate(180deg);
+}
+
+#left-side .hippo-text {
+    left: 200px;
+}
+
+#left-side .hippo-head-image {
+    transform: rotate(-90deg);
+}

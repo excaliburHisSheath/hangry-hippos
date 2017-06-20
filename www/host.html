@@ -3,15 +3,19 @@
     <head>
         <meta charset="utf-8">
         <title>Hangry Hangry Hippos</title>
+
         <!-- Development version of Vue.js, at some point use the release version. -->
         <script src="https://vuejs.org/js/vue.js"></script>
 
-        <!-- Latest version of Phaser CE. -->
-        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2"></script>
+        <!-- Greensock JS Animation Platform. -->
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
 
         <!-- Our super cool helper scripts. -->
         <script src="assert.js"></script>
         <script src="request.js"></script>
+
+        <!-- The host's style sheet. -->
+        <link href="host.css" rel="stylesheet"></link>
 
         <!-- Favicons in all shapes and colors. -->
         <link rel="apple-touch-icon" sizes="57x57" href="assets/favicon/apple-icon-57x57.png">
@@ -34,24 +38,49 @@
     </head>
 
     <body>
-        <!--
-            Phaser root element. When we initialize Phaser, we tell it to create
-            its canvas inside `#phaser-root`.
-        -->
-        <div id="phaser-root"></div>
+        <div id="vue-root">
+            <div id="top-side" class="horizontal-side">
+                <hippo-head
+                    v-for="hippo in topHippos"
+                    :key="hippo.player.id"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
+                ></hippo-head>
+            </div>
 
+            <div id="right-side" class="vertical-side">
+                <hippo-head
+                    v-for="hippo in rightHippos"
+                    :key="hippo.player.id"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
+                >
+                </hippo-head>
+            </div>
 
-        <!--
-            Vue root element. We use VueJS for rendering debug information.
-            Vue's functionality is only active within `#vue-root`. Debug
-            output is hidden when the `isDebugEnabled` flag is set to `false`.
-        -->
-        <div id="vue-root" v-if="isDebugEnabled">
-            <ul>
-                <li v-for="player in players">
-                    {{ player.id }} has eaten {{ player.score }} colorful balls!
-                </li>
-            </ul>
+            <div id="bottom-side" class="horizontal-side">
+                <hippo-head
+                    v-for="hippo in bottomHippos"
+                    :key="hippo.player.id"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
+                >
+                </hippo-head>
+            </div>
+
+            <div id="left-side" class="vertical-side">
+                <hippo-head
+                    v-for="hippo in leftHippos"
+                    :key="hippo.player.id"
+                    v-bind:name="'TODO NAME ME'"
+                    v-bind:score="hippo.player.score"
+                    v-bind:id="hippo.player.id"
+                >
+                </hippo-head>
+            </div>
         </div>
 
         <!-- Load script for the host. -->
