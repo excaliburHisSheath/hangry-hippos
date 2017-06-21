@@ -136,3 +136,14 @@ function registerPlayer(player) {
     sides[currentSide].push(hippo);
     currentSide = (currentSide + 1) % 4;
 }
+
+// Start the attract an
+let element = document.getElementById('attract-message');
+const ATTRACT_ANIM_DURATION = 0.75;
+TweenMax.to(element, ATTRACT_ANIM_DURATION, { scale: 1.3, repeat: -1, yoyo: true });
+TweenMax.fromTo(
+    element,
+    ATTRACT_ANIM_DURATION * 2,
+    { rotation: -3 },
+    { rotation: 3, ease: Sine.easeInOut, repeat: -1, yoyo: true, delay: ATTRACT_ANIM_DURATION },
+);

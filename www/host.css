@@ -128,3 +128,18 @@ body {
 #left-side .hippo-head-image {
     transform: rotate(-90deg);
 }
+
+#attract-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+
+    font-size: 170%;
+}
+
+#site-address {
+    font-size: 130%;
+    color: #bc00a6;
+}
