@@ -34,12 +34,17 @@ Vue.component('hippo-head', {
     `,
 });
 
-// Helpers to allow us to place hippos in clockwise order.
-let sides = [
-    app.topHippos,
-    app.rightHippos,
-    app.bottomHippos,
-    app.leftHippos,
+// Helpers to allow us to place hippos in clockwise order. By cycling through this array, we choose
+// which sides the hippos are added to and in which proportion. We choose to add twice as many
+// hippos to the top and bottom of the screen as to the sides, which looks better on wide-screen
+// displays (which is moslty what we're supporting at this point).
+const SIDES = [
+    { array: app.topHippos, side: TOP_SIDE },
+    { array: app.topHippos, side: TOP_SIDE },
+    { array: app.rightHippos, side: RIGHT_SIDE },
+    { array: app.bottomHippos, side: BOTTOM_SIDE },
+    { array: app.bottomHippos, side: BOTTOM_SIDE },
+    { array: app.leftHippos, side: LEFT_SIDE },
 ];
 let currentSide = 0;
 
@@ -121,20 +126,20 @@ get('/api/players', response => {
  * Creates a hippo for the new player and adds it to one side of the screen.
  */
 function registerPlayer(player) {
+    // Get the side that we're going to add the hippo to.
+    let side = SIDES[currentSide];
+    currentSide = (currentSide + 1) % sides.length;
+
     // Create a hippo object for the player.
     let hippo = {
         player: player,
-        side: currentSide,
+        side: side.side,
     };
 
-    // Add the hippo to the hippo map.
+    // Add the hippo to the hippo map and its side of the screen.
     assert(app.hippoMap[player.id] == null, 'Hippo already exists for ID: ' + player.id);
     app.hippoMap[player.id] = hippo;
-
-    // Add the hippo to one of the sides of the screen. We cycle the sides clockwise to make sure
-    // the hippos are distributed evenly.
-    sides[currentSide].push(hippo);
-    currentSide = (currentSide + 1) % 4;
+    side.array.push(hippo);
 }
 
 // Start the attract an
