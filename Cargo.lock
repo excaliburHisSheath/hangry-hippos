@@ -2,6 +2,7 @@
 name = "hangry-river-horse"
 version = "0.1.0"
 dependencies = [
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket_codegen 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket_contrib 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",

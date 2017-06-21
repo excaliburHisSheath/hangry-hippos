@@ -1,3 +1,4 @@
+use rand::*;
 use serde::*;
 use std::collections::HashMap;
 use std::sync::atomic::*;
@@ -56,13 +57,67 @@ impl PlayerIdGenerator {
     }
 }
 
+/// Generator for a player username.
+///
+#[derive(Debug)]
+pub struct PlayerNameGenerator;
+
+impl PlayerNameGenerator {
+
+    pub fn generate_username(&self) -> String {
+
+        let name_list = vec!
+        [
+            "Hiphopopotamus",
+            "Rhymenocerous",
+            "Steve",
+            "Peter Potamus",
+            "Mr. Wiggles",
+            "Seargent Snout",
+            "Calamity Hippopatamy",
+            "Ringo Potamus",
+            "Mrs. Basil E. Frankenhippo",
+            "Harry Pottamus",
+            "Hermoine Potamus",
+            "Buckbeak",
+            "Marie Hippolonium",
+            "Hippope Francis",
+            "Hippaul Potamus",
+            "Danerys Mother of Hippos",
+            "Darth Potamus",
+            "Ann Perkopotamins!",
+            "Hippopotahut",
+            "Hippopotabell",
+            "Combination Hippopotahut and Hippopotabell",
+            "Hippchat",
+            "Zippo",
+            "Let 'er Rippo",
+            "Have a Nice Trippo",
+            "Tortilla Chippo",
+            "Lastey",
+            "Jean-Baptiste Emanuel Hippo",
+            "Hippo Hipposon",
+            "Son of Potamus",
+        ];
+
+        match thread_rng().choose(&name_list) {
+            None => "".to_string(),
+            Some(name) => name.to_string(),
+        }
+    }
+}
+
 pub type Scoreboard = HashMap<PlayerId, usize>;
+pub type Usernames = HashMap<PlayerId, String>;
 
 /// The current state for a single player.
 #[derive(Debug, Serialize)]
 pub struct PlayerData {
     /// A unique identifier for the player.
     pub id: PlayerId,
+
+    /// The player's display name
+    pub username: String,
 
     /// The player's current score.
     pub score: usize,

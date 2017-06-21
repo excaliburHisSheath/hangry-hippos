@@ -1,6 +1,7 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
+extern crate rand;
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
@@ -69,5 +70,6 @@ fn main() {
         .manage(host_broadcaster)
         .manage(client_broadcaster)
         .manage(Mutex::new(Scoreboard::new()))
+        .manage(Mutex::new(Usernames::new()))
         .launch();
 }

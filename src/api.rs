@@ -11,6 +11,7 @@ use std::sync::*;
 pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
+    pub username: String,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -19,10 +20,20 @@ pub struct RegisterPlayerResponse {
 pub fn register_player(
     player_id_generator: State<PlayerIdGenerator>,
     scoreboard: State<Mutex<Scoreboard>>,
+    usernames: State<Mutex<Usernames>>,
     broadcaster: State<HostBroadcaster>,
 ) -> JSON<RegisterPlayerResponse>
 {
     let player_id = player_id_generator.next_id();
+    let username = PlayerNameGenerator.generate_username();
+
+    // Add the username to the Usernames map
+    let name_clone = {
+        let mut usernames = usernames.lock().expect("Usernames mutex was poisoned");
+        let old = usernames.insert(player_id, username.clone());
+        assert_eq!(None, old, "Player ID was registered twice");
+        username
+    };
 
     // Add the player to the scoreboard.
     {
@@ -34,12 +45,14 @@ pub fn register_player(
     // Broadcast to all hosts that a new player has joined.
     broadcaster.send(HostBroadcast::PlayerRegistered(PlayerData {
         id: player_id,
+        username: name_clone.clone(),
         score: 0,
     }));
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id: player_id,
+        username: name_clone,
     })
 }
 
@@ -111,11 +124,26 @@ pub struct PlayersResponse {
 /// This is used by new host connections to update thier display to match the current state of the
 /// game.
 #[get("/players")]
-pub fn get_players(scoreboard: State<Mutex<Scoreboard>>) -> JSON<PlayersResponse> {
+pub fn get_players(
+    scoreboard: State<Mutex<Scoreboard>>,
+    usernames: State<Mutex<Usernames>>,
+) -> JSON<PlayersResponse> {
     // Clone the scoreboard so we can release the lock on it quickly.
     let scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned").clone();
 
-    let players = scoreboard.iter().map(|(&id, &score)| PlayerData { id, score }).collect();
+    let usernames = usernames.lock().expect("Usernames mutex was poisoned").clone();
+
+    let players = scoreboard.iter()
+        .map(
+            |(&id, &score)|
+            {
+                let username = match usernames.get(&id) {
+                    None => "".to_string(),
+                    Some(i) => i.to_string(),
+                };
+                PlayerData { id, username, score }
+            }
+        ).collect();
 
     JSON(PlayersResponse { players })
 }
