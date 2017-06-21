@@ -41,7 +41,9 @@ Vue.component('hippo-head', {
 const SIDES = [
     { array: app.topHippos, side: TOP_SIDE },
     { array: app.topHippos, side: TOP_SIDE },
+    { array: app.topHippos, side: TOP_SIDE },
     { array: app.rightHippos, side: RIGHT_SIDE },
+    { array: app.bottomHippos, side: BOTTOM_SIDE },
     { array: app.bottomHippos, side: BOTTOM_SIDE },
     { array: app.bottomHippos, side: BOTTOM_SIDE },
     { array: app.leftHippos, side: LEFT_SIDE },
@@ -128,7 +130,7 @@ get('/api/players', response => {
 function registerPlayer(player) {
     // Get the side that we're going to add the hippo to.
     let side = SIDES[currentSide];
-    currentSide = (currentSide + 1) % sides.length;
+    currentSide = (currentSide + 1) % SIDES.length;
 
     // Create a hippo object for the player.
     let hippo = {
