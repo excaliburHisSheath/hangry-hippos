@@ -134,7 +134,7 @@ impl PlayerNameGenerator {
             "Hippuna Matatamus",
         ];
 
-        thread_rng().choose(&name_list).unwrap().to_string();
+        thread_rng().choose(&name_list).unwrap().to_string()
     }
 }
 
