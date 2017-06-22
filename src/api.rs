@@ -1,4 +1,5 @@
 use broadcast::*;
+use game;
 use game::*;
 use rocket::http::Status;
 use rocket::response::*;
@@ -25,7 +26,7 @@ pub fn register_player(
 ) -> JSON<RegisterPlayerResponse>
 {
     let player_id = player_id_generator.next_id();
-    let username = PlayerNameGenerator.generate_username();
+    let username = game::generate_username();
 
     // Add the username to the Usernames map
     {
@@ -133,13 +134,11 @@ pub fn get_players(
     let usernames = usernames.lock().expect("Usernames mutex was poisoned").clone();
 
     let players = scoreboard.iter()
-        .map(
-            |(&id, &score)|
-            {
-                let username = usernames.get(&id).expect("Player ID was in scoreboard but not usernames table").to_string();
-                PlayerData { id, username, score }
-            }
-        ).collect();
+        .map(|(&id, &score)| {
+            let username = usernames.get(&id).expect("Player ID was in scoreboard but not usernames table").to_string();
+            PlayerData { id, username, score }
+        })
+        .collect();
 
     JSON(PlayersResponse { players })
 }
