@@ -28,11 +28,10 @@ pub fn register_player(
     let username = PlayerNameGenerator.generate_username();
 
     // Add the username to the Usernames map
-    let name_clone = {
+    {
         let mut usernames = usernames.lock().expect("Usernames mutex was poisoned");
         let old = usernames.insert(player_id, username.clone());
         assert_eq!(None, old, "Player ID was registered twice");
-        username
     };
 
     // Add the player to the scoreboard.
@@ -45,14 +44,14 @@ pub fn register_player(
     // Broadcast to all hosts that a new player has joined.
     broadcaster.send(HostBroadcast::PlayerRegistered(PlayerData {
         id: player_id,
-        username: name_clone.clone(),
+        username: username.clone(),
         score: 0,
     }));
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id: player_id,
-        username: name_clone,
+        username: username,
     })
 }
 
@@ -137,10 +136,7 @@ pub fn get_players(
         .map(
             |(&id, &score)|
             {
-                let username = match usernames.get(&id) {
-                    None => "".to_string(),
-                    Some(i) => i.to_string(),
-                };
+                let username = usernames.get(&id).expect("Player ID was in scoreboard but not usernames table").to_string();
                 PlayerData { id, username, score }
             }
         ).collect();
