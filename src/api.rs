@@ -128,14 +128,14 @@ pub fn get_players(
     scoreboard: State<Mutex<Scoreboard>>,
     usernames: State<Mutex<Usernames>>,
 ) -> JSON<PlayersResponse> {
-    // Clone the scoreboard so we can release the lock on it quickly.
+    // Clone the scoreboard and usernames table so we can work on their data without holding the
+    // mutex for too long.
     let scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned").clone();
+    let mut usernames = usernames.lock().expect("Usernames mutex was poisoned").clone();
 
-    let usernames = usernames.lock().expect("Usernames mutex was poisoned").clone();
-
-    let players = scoreboard.iter()
-        .map(|(&id, &score)| {
-            let username = usernames.get(&id).expect("Player ID was in scoreboard but not usernames table").to_string();
+    let players = usernames.drain()
+        .map(|(id, username)| {
+            let score = *scoreboard.get(&id).expect("Score for player was not in scoreboard");
             PlayerData { id, username, score }
         })
         .collect();
