@@ -135,7 +135,6 @@ impl PlayerNameGenerator {
         ];
 
         thread_rng().choose(&name_list).unwrap().to_string();
-        "🦏".to_string()
     }
 }
 
