@@ -156,10 +156,21 @@ pub struct Player {
 
 pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
 
-pub fn start_game_loop(players: PlayerMap, host_broadcaster: HostBroadcaster) {
+/// Runs the main logic of the game on a separate thread.
+///
+/// Spawns a thread that updates game state and broadcasts updates to the players and hosts.
+pub fn start_game_loop(
+    players: PlayerMap,
+    host_broadcaster: HostBroadcaster,
+    player_broadcaster: PlayerBroadcaster,
+) {
     thread::spawn(move || {
         loop {
             let now = Instant::now();
+
+            // Limit the scope in which we lock the player map. If we don't scope this manually,
+            // we'd still be holding the lock when we sleep the thread, so any requests that need
+            // the player data would deadlock.
             {
                 let mut players = players.write().expect("Hippo map was poisoned!");
                 players.retain(|&id, player| {
@@ -176,6 +187,13 @@ pub fn start_game_loop(players: PlayerMap, host_broadcaster: HostBroadcaster) {
 
                         // Broadcast the new score to all hosts.
                         host_broadcaster.send(HostBroadcast::HippoEat {
+                            id,
+                            score: player.score,
+                            balls: player.balls,
+                        });
+
+                        // Broadcast the new score to all players.
+                        player_broadcaster.send(PlayerBroadcast::HippoEat {
                             id,
                             score: player.score,
                             balls: player.balls,

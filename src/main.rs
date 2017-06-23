@@ -50,11 +50,15 @@ fn main() {
     // Start websocket servers for broadcasting messages to host clients and player clients. The
     // resulting `Broadcaster<T>` objects are given to Rocket as managed state so that any API
     // endpoint can broadcast state changes as necessary.
-    let client_broadcaster = broadcast::start_server::<PlayerBroadcast>("0.0.0.0:6768");
+    let player_broadcaster = broadcast::start_server::<PlayerBroadcast>("0.0.0.0:6768");
     let host_broadcaster = broadcast::start_server::<HostBroadcast>("0.0.0.0:6769");
 
     let players = PlayerMap::default();
-    game::start_game_loop(players.clone(), host_broadcaster.clone());
+    game::start_game_loop(
+        players.clone(),
+        host_broadcaster.clone(),
+        player_broadcaster.clone(),
+    );
 
     // Start the main Rocket application.
     rocket::ignite()
@@ -71,6 +75,6 @@ fn main() {
         .manage(PlayerIdGenerator::new())
         .manage(players)
         .manage(host_broadcaster)
-        .manage(client_broadcaster)
+        .manage(player_broadcaster)
         .launch();
 }

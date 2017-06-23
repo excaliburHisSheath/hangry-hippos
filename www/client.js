@@ -37,7 +37,16 @@ let app = new Vue({
 // actually a good idea, but whatevs.
 let socket = new WebSocket('ws://' + window.location.hostname + ':6768');
 socket.onmessage = function(event) {
-    console.log('socket event: ', event);
+    // TODO: Do some kind of validation.
+    let payload = JSON.parse(event.data);
+
+    if (payload['HippoEat']) {
+        let info = payload['HippoEat'];
+        if (info.id === app.id) {
+            app.score = info.score;
+            app.balls = info.balls;
+        }
+    }
 };
 
 socket.onerror = function(error) {
@@ -51,7 +60,6 @@ socket.onclose = function(event) {
 
 // Register the player with the backend.
 get('api/register-player', response => {
-    console.log('Registration result: ', response);
     app.id = response.id;
     app.username = response.username;
     app.score = 0;
