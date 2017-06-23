@@ -116,11 +116,22 @@ pub struct PlayersResponse {
     pub players: Vec<PlayerData>,
 }
 
+/// The current state for a player that is needed by the host site.
+///
+/// This doesn't include all of the player's internal state data, only the information needed
+/// by the display site.
 #[derive(Debug, Serialize)]
 pub struct PlayerData {
+    /// The player's ID.
     id: PlayerId,
+
+    /// The player's display name.
     username: String,
+
+    /// The player's current score.
     score: usize,
+
+    /// The total number of balls in the players food pile.
     balls: usize,
 }
 

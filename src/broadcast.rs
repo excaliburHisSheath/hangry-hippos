@@ -14,24 +14,43 @@ pub type PlayerBroadcaster = Arc<Broadcaster<PlayerBroadcast>>;
 /// A message to be broadcast to connected host clients.
 #[derive(Debug, Serialize)]
 pub enum HostBroadcast {
+    /// A new player has joined the game and should be added to the display.
     PlayerRegister {
+        // The ID of the new player.
         id: PlayerId,
+
+        // The player's display name.
         username: String,
+
+        /// The starting score for the player.
         score: usize,
+
+        /// The starting number of balls in the player's food pile.
         balls: usize,
     },
 
+    /// A player has added a ball to their food pile.
     AddBall {
+        /// The ID of the player who got the ball.
         id: PlayerId,
+
+        /// The total number of balls in the player's food pile.
         balls: usize,
     },
 
+    /// A hippo has eaten a ball from their food pile.
     HippoEat {
+        /// The ID for the player whose hippo ate the ball.
         id: PlayerId,
+
+        /// The player's total score.
         score: usize,
+
+        /// The total number of balls in the player's food pile.
         balls: usize,
     },
 
+    /// A player has lost the game and should be removed from the display.
     PlayerLose {
         id: PlayerId,
     }
