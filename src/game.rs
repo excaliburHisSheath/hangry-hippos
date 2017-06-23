@@ -1,6 +1,9 @@
 use serde::*;
 use std::collections::HashMap;
+use std::sync::*;
 use std::sync::atomic::*;
+use std::thread;
+use std::time::*;
 
 /// Uniquely identifies a connected player.
 ///
@@ -66,4 +69,38 @@ pub struct PlayerData {
 
     /// The player's current score.
     pub score: usize,
+}
+
+pub type HippoMap = Arc<RwLock<HashMap<PlayerId, HippoState>>>;
+
+#[derive(Debug)]
+pub struct HippoState {
+    next_chomp_time: Instant,
+    balls: usize,
+}
+
+pub fn start_game_loop(hippos: HippoMap) {
+    thread::spawn(move || {
+        loop {
+            let now = Instant::now();
+            {
+                let mut hippos = hippos.write().expect("Hippo map was poisoned!");
+                for (id, hippo) in hippos.iter_mut() {
+                    if now > hippo.next_chomp_time {
+                        // Try to eat a ball. If there's one for the hippo to eat, we get a point.
+                        // Otherwise, the hippo is le dead.
+                        if hippo.balls > 0 {
+                            hippo.balls -= 1;
+
+                            // TODO: Broadcast the score event.
+                        } else {
+                            // TODO: Kill the hippo!
+                        }
+                    }
+                }
+            }
+
+            thread::sleep(Duration::from_millis(100));
+        }
+    });
 }

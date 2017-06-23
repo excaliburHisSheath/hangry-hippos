@@ -53,6 +53,9 @@ fn main() {
     let client_broadcaster = broadcast::start_server::<PlayerBroadcast>("0.0.0.0:6768");
     let host_broadcaster = broadcast::start_server::<HostBroadcast>("0.0.0.0:6769");
 
+    let hippos = HippoMap::default();
+    game::start_game_loop(hippos.clone());
+
     // Start the main Rocket application.
     rocket::ignite()
         .mount("/", routes![
@@ -69,5 +72,6 @@ fn main() {
         .manage(host_broadcaster)
         .manage(client_broadcaster)
         .manage(Mutex::new(Scoreboard::new()))
+        .manage(hippos)
         .launch();
 }
