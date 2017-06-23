@@ -42,15 +42,15 @@
 
     <body>
         <div id="app-root" v-on:click="feedMe">
-            <h1>Hangry River Horse</h1>
-            <div>These hippos are hangry, and the only thing they can satisfy them is colorful balls!</div>
+            <h1>HungryHipp.us</h1>
 
             <div id="centered-text">
                 <div>
                     <h2>{{ username }}</h2>
                 </div>
                 <div id="tap-text">Tap anywhere to feed your hippo!</div>
-                <div id="score-text">You have {{ score }} balls!</div>
+                <div id="score-text">Score: {{ score }}</div>
+                <div id="food-text">You have {{ balls }} balls available to feed your hippo!</div>
             </div>
         </div>
 

@@ -8,6 +8,7 @@ let app = new Vue({
         id: null,
         username: null,
         score: null,
+        balls: null,
     },
 
     methods: {
@@ -26,7 +27,7 @@ let app = new Vue({
             );
 
             post('api/feed-me', payload, response => {
-                this.score = response.score;
+                this.balls = response.balls;
             });
         },
     },
@@ -43,9 +44,9 @@ socket.onerror = function(error) {
     console.error(error);
 };
 
-socket.onclose = function() {
+socket.onclose = function(event) {
     // TODO: Re-open the connection, if possible.
-    console.log('Socket closed I guess');
+    console.error('Socket closed I guess: ', event);
 };
 
 // Register the player with the backend.
@@ -53,4 +54,6 @@ get('api/register-player', response => {
     console.log('Registration result: ', response);
     app.id = response.id;
     app.username = response.username;
+    app.score = 0;
+    app.balls = response.balls;
 });
