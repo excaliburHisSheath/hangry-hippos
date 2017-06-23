@@ -104,11 +104,11 @@ body {
 }
 
 #top-side .hippo-text {
-    top: 100px;
+    top: 200px;
 }
 
 #right-side .hippo-text {
-    right: 100px;
+    right: 200px;
 }
 
 #right-side .hippo-head-image {
@@ -116,7 +116,7 @@ body {
 }
 
 #bottom-side .hippo-text {
-    bottom: 100px;
+    bottom: 200px;
 }
 
 #bottom-side .hippo-head-image {
@@ -124,7 +124,7 @@ body {
 }
 
 #left-side .hippo-text {
-    left: 100px;
+    left: 200px;
 }
 
 #left-side .hippo-head-image {

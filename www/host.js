@@ -22,12 +22,13 @@ let app = new Vue({
 });
 
 Vue.component('hippo-head', {
-    props: ['name', 'score', 'id'],
+    props: ['name', 'score', 'id', 'balls'],
     template: `
     <div class="hippo-head">
         <div class="hippo-text">
             <div class="hippo-name">{{ name }}</div>
             <div class="hippo-score">Score: {{ score }}</div>
+            <div class="hippo=balls">Balls: {{ balls }}</div>
         </div>
         <img src="assets/hippo.jpg" class="hippo-head-image" :id="id">
     </div>
@@ -56,10 +57,18 @@ socket.onmessage = (event) => {
     // TODO: Do some validation on the payload data I guess.
     let payload = JSON.parse(event.data);
 
-    if (payload['PlayerRegistered']) {
-        registerPlayer(payload['PlayerRegistered']);
-    } else if (payload['PlayerScore']) {
-        let info = payload['PlayerScore'];
+    if (payload['PlayerRegister']) {
+        registerPlayer(payload['PlayerRegister']);
+    } else if (payload['AddBall']) {
+        let info = payload['AddBall'];
+
+        // Find the hippo/player for the player that scored.
+        let hippo = app.hippoMap[info.id];
+        assert(hippo != null, 'Unable to find hippo for ID: ' + info.id);
+
+        hippo.player.balls = info.balls;
+    } else if (payload['HippoEat']) {
+        let info = payload['HippoEat'];
 
         // Find the hippo/player for the player that scored.
         let hippo = app.hippoMap[info.id];
@@ -67,6 +76,7 @@ socket.onmessage = (event) => {
 
         // Updated the local score for the player.
         hippo.player.score = info.score;
+        hippo.player.balls = info.balls;
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on.

@@ -119,7 +119,6 @@ where
         // websockets connected to the server.
         for broadcast in broadcast_receiver {
             let payload = ::serde_json::to_string(&broadcast).expect("Failed to serialize payload");
-            println!("About to broadcast payload: {:?}", payload);
             socket.broadcast(payload.clone()).unwrap();
         }
     });
