@@ -6,7 +6,8 @@ let app = new Vue({
 
     data: {
         id: null,
-        score: 0,
+        username: null,
+        score: null,
     },
 
     methods: {
@@ -51,4 +52,5 @@ socket.onclose = function() {
 get('api/register-player', response => {
     console.log('Registration result: ', response);
     app.id = response.id;
+    app.username = response.username;
 });

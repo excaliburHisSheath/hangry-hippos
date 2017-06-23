@@ -1,3 +1,4 @@
+use rand::*;
 use serde::*;
 use std::collections::HashMap;
 use std::sync::*;
@@ -59,13 +60,91 @@ impl PlayerIdGenerator {
     }
 }
 
+/// Generates a random username for new players.
+///
+/// Names are chosen from a pre-written list of guaranteed-funny names.
+pub fn generate_username() -> String {
+    static NAMES: &'static [&'static str] = &[
+        "Hiphopopotamus",
+        "Rhymenocerous",
+        "Steve",
+        "Peter Potamus",
+        "Mr. Wiggles",
+        "Seargent Snout",
+        "Calamity Hippopatamy",
+        "Hippaul Potamus",
+        "Ringo Potamus",
+        "Mrs. Basil E. Frankenhippo",
+        "Harry Pottamus",
+        "Hermoine Potamus",
+        "Buckbeak",
+        "Hippendor",
+        "Hippopuff",
+        "Marie Hippolonium",
+        "Hippope Francis",
+        "Danerys Mother of Hippos",
+        "Darth Potamus",
+        "Hippo the Hutt",
+        "Ann Perkopotamins!",
+        "Hippopotahut",
+        "Hippopotabell",
+        "Combination Hippopotahut and Hippopotabell",
+        "Hippchat",
+        "Slackapotamus",
+        "Skyppo",
+        "Zippo",
+        "Let 'er Rippo",
+        "Have a Nice Trippo",
+        "Tortilla Chippo",
+        "Lastey",
+        "Jean-Baptiste Emanuel Hippo",
+        "Hippo Hipposon",
+        "Son of Potamus",
+        "Hippo V. Debs",
+        "Hippolyta",
+        "Wonder Potamus",
+        "Hippobrine",
+        "H-1000",
+        "H-1PO",
+        "Hippo of Time",
+        "Hippo of Winds",
+        "Hippo of Hyrule",
+        "Hippo Lippa Lub Dub",
+        "Annoying Hippo",
+        "Raging Hippo",
+        "Raging Rhymenocerous",
+        "OMG! Hippopotamus",
+        "Hippo Chief 2",
+        "Hippo Ex Potamus",
+        "Hippo Vodello",
+        "Hippo Not Stirred",
+        "Hippo the Grey",
+        "Hippo the White",
+        "The One Hippo",
+        "Jean-Luc Hippicard",
+        "Padmé Potamus",
+        "🦏",
+        "The Incredible Hippo",
+        "The Amazing Spider-Hippo",
+        "Notorius Hippo G",
+        "The More You Hippo",
+        "Hippuna Matatamus",
+    ];
+
+    thread_rng().choose(NAMES).unwrap().to_string()
+}
+
 pub type Scoreboard = HashMap<PlayerId, usize>;
+pub type Usernames = HashMap<PlayerId, String>;
 
 /// The current state for a single player.
 #[derive(Debug, Serialize)]
 pub struct PlayerData {
     /// A unique identifier for the player.
     pub id: PlayerId,
+
+    /// The player's display name
+    pub username: String,
 
     /// The player's current score.
     pub score: usize,
