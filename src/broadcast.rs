@@ -8,16 +8,28 @@ use std::sync::*;
 use std::thread;
 use ws;
 
-pub type HostBroadcaster = Broadcaster<HostBroadcast>;
-pub type PlayerBroadcaster = Broadcaster<PlayerBroadcast>;
+pub type HostBroadcaster = Arc<Broadcaster<HostBroadcast>>;
+pub type PlayerBroadcaster = Arc<Broadcaster<PlayerBroadcast>>;
 
 /// A message to be broadcast to connected host clients.
 #[derive(Debug, Serialize)]
 pub enum HostBroadcast {
-    PlayerRegistered(PlayerData),
-    PlayerScore {
+    PlayerRegister {
+        id: PlayerId,
+        username: String,
+        score: usize,
+        balls: usize,
+    },
+
+    AddBall {
+        id: PlayerId,
+        balls: usize,
+    },
+
+    HippoEat {
         id: PlayerId,
         score: usize,
+        balls: usize,
     },
 }
 
@@ -67,7 +79,7 @@ impl<T> Broadcaster<T> {
 /// workaround because Rocket doesn't yet directly support websockets. The returned `mpsc::Sender`
 /// allows for API messages to be sent from any number of threads to the websocket server, at which
 /// point they will be broadcast to any connected clients.
-pub fn start_server<T>(server_address: &'static str) -> Broadcaster<T>
+pub fn start_server<T>(server_address: &'static str) -> Arc<Broadcaster<T>>
 where
     T: 'static + ::serde::ser::Serialize + Send,
 {
@@ -112,7 +124,7 @@ where
         }
     });
 
-    Broadcaster {
+    Arc::new(Broadcaster {
         inner: Mutex::new(broadcast_sender),
-    }
+    })
 }

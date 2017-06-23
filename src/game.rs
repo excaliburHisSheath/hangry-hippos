@@ -1,3 +1,4 @@
+use broadcast::*;
 use rand::*;
 use serde::*;
 use std::collections::HashMap;
@@ -134,12 +135,9 @@ pub fn generate_username() -> String {
     thread_rng().choose(NAMES).unwrap().to_string()
 }
 
-pub type Scoreboard = HashMap<PlayerId, usize>;
-pub type Usernames = HashMap<PlayerId, String>;
-
 /// The current state for a single player.
-#[derive(Debug, Serialize)]
-pub struct PlayerData {
+#[derive(Debug)]
+pub struct Player {
     /// A unique identifier for the player.
     pub id: PlayerId,
 
@@ -148,30 +146,40 @@ pub struct PlayerData {
 
     /// The player's current score.
     pub score: usize,
+
+    /// The number of balls in the player's food pile.
+    pub balls: usize,
+
+    /// The time at which the player's hippo will next eat a ball.
+    pub next_eat_time: Instant,
 }
 
-pub type HippoMap = Arc<RwLock<HashMap<PlayerId, HippoState>>>;
+pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
 
-#[derive(Debug)]
-pub struct HippoState {
-    next_chomp_time: Instant,
-    balls: usize,
-}
-
-pub fn start_game_loop(hippos: HippoMap) {
+pub fn start_game_loop(players: PlayerMap, host_broadcaster: HostBroadcaster) {
     thread::spawn(move || {
         loop {
             let now = Instant::now();
             {
-                let mut hippos = hippos.write().expect("Hippo map was poisoned!");
-                for (id, hippo) in hippos.iter_mut() {
-                    if now > hippo.next_chomp_time {
+                let mut players = players.write().expect("Hippo map was poisoned!");
+                for (&id, player) in players.iter_mut() {
+                    if now > player.next_eat_time {
+                        // Determine the next time the player's hippo will eat.
+                        player.next_eat_time += Duration::from_millis(750);
+
                         // Try to eat a ball. If there's one for the hippo to eat, we get a point.
                         // Otherwise, the hippo is le dead.
-                        if hippo.balls > 0 {
-                            hippo.balls -= 1;
+                        if player.balls > 0 {
+                            // Eat a ball, get a point.
+                            player.balls -= 1;
+                            player.score += 1;
 
-                            // TODO: Broadcast the score event.
+                            // Broadcast the new score to all hosts.
+                            host_broadcaster.send(HostBroadcast::HippoEat {
+                                id,
+                                score: player.score,
+                                balls: player.balls,
+                            });
                         } else {
                             // TODO: Kill the hippo!
                         }

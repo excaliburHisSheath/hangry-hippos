@@ -14,7 +14,6 @@ use game::*;
 use rocket::response::*;
 use std::io;
 use std::path::*;
-use std::sync::*;
 
 mod api;
 mod broadcast;
@@ -54,8 +53,8 @@ fn main() {
     let client_broadcaster = broadcast::start_server::<PlayerBroadcast>("0.0.0.0:6768");
     let host_broadcaster = broadcast::start_server::<HostBroadcast>("0.0.0.0:6769");
 
-    let hippos = HippoMap::default();
-    game::start_game_loop(hippos.clone());
+    let players = PlayerMap::default();
+    game::start_game_loop(players.clone(), host_broadcaster.clone());
 
     // Start the main Rocket application.
     rocket::ignite()
@@ -70,10 +69,8 @@ fn main() {
             api::get_players,
         ])
         .manage(PlayerIdGenerator::new())
+        .manage(players)
         .manage(host_broadcaster)
         .manage(client_broadcaster)
-        .manage(Mutex::new(Scoreboard::new()))
-        .manage(Mutex::new(Usernames::new()))
-        .manage(hippos)
         .launch();
 }

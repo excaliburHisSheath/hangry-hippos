@@ -5,7 +5,7 @@ use rocket::http::Status;
 use rocket::response::*;
 use rocket::State;
 use rocket_contrib::JSON;
-use std::sync::*;
+use std::time::*;
 
 /// The response sent back from the `/register-player` endpoint.
 #[derive(Debug, Serialize)]
@@ -13,6 +13,7 @@ pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
     pub username: String,
+    pub balls: usize,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -20,39 +21,42 @@ pub struct RegisterPlayerResponse {
 #[get("/register-player")]
 pub fn register_player(
     player_id_generator: State<PlayerIdGenerator>,
-    scoreboard: State<Mutex<Scoreboard>>,
-    usernames: State<Mutex<Usernames>>,
+    players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
 ) -> JSON<RegisterPlayerResponse>
 {
-    let player_id = player_id_generator.next_id();
+    let id = player_id_generator.next_id();
     let username = game::generate_username();
+    let balls = 10;
 
-    // Add the username to the Usernames map
-    {
-        let mut usernames = usernames.lock().expect("Usernames mutex was poisoned");
-        let old = usernames.insert(player_id, username.clone());
-        assert_eq!(None, old, "Player ID was registered twice");
+    let player = Player {
+        id,
+        username: username.clone(),
+        score: 0,
+        balls,
+        next_eat_time: Instant::now() + Duration::from_millis(1000),
     };
 
-    // Add the player to the scoreboard.
+    // Add the player to the game state.
     {
-        let mut scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned");
-        let old = scoreboard.insert(player_id, 0);
-        assert_eq!(None, old, "Player ID was registered twice");
+        let mut players = players.write().expect("Players map was poisoned!");
+        let old = players.insert(id, player);
+        assert!(old.is_none(), "Player ID was registered twice");
     }
 
     // Broadcast to all hosts that a new player has joined.
-    broadcaster.send(HostBroadcast::PlayerRegistered(PlayerData {
-        id: player_id,
+    broadcaster.send(HostBroadcast::PlayerRegister {
+        id,
         username: username.clone(),
         score: 0,
-    }));
+        balls,
+    });
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
-        id: player_id,
-        username: username,
+        id,
+        username,
+        balls,
     })
 }
 
@@ -66,7 +70,7 @@ pub struct FeedPlayerRequest {
 /// The response sent back from the `/feed-me` endpoint.
 #[derive(Debug, Serialize)]
 pub struct FeedPlayerResponse {
-    score: usize,
+    balls: usize,
 }
 
 /// Feeds a player's hippo, increasing the player's score.
@@ -78,36 +82,29 @@ pub struct FeedPlayerResponse {
 #[post("/feed-me", format = "application/json", data = "<payload>")]
 pub fn feed_player(
     payload: JSON<FeedPlayerRequest>,
-    scoreboard: State<Mutex<Scoreboard>>,
+    players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
 ) -> Result<JSON<FeedPlayerResponse>>
 {
     let payload = payload.into_inner();
-    let player_id = payload.player;
+    let id = payload.player;
 
     // Add 1 to the player's score, returning the new score.
-    let score = {
-        let mut scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned");
+    let balls = {
+        let mut players = players.write().expect("Players were poisoned");
 
         // Get the player's current score, or return an `InvalidPlayer` error if it's not in
         // the scoreboard.
-        let score = scoreboard
-            .get_mut(&player_id)
-            .ok_or(Error::InvalidPlayer(player_id))?;
-        *score += 1;
-        *score
+        let player = players
+            .get_mut(&id)
+            .ok_or(Error::InvalidPlayer(id))?;
+        player.balls += 1;
+        player.balls
     };
 
-    // Broadcast the new score to all hosts.
-    broadcaster.send(HostBroadcast::PlayerScore {
-        id: player_id,
-        score: score,
-    });
-
-    // Respond to the client.
-    Ok(JSON(FeedPlayerResponse {
-        score: score,
-    }))
+    // Update the host displays and respond to the player.
+    broadcaster.send(HostBroadcast::AddBall { id, balls });
+    Ok(JSON(FeedPlayerResponse { balls }))
 }
 
 /// The response sent back from the `/scoreboard` endpoint.
@@ -119,24 +116,29 @@ pub struct PlayersResponse {
     pub players: Vec<PlayerData>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct PlayerData {
+    id: PlayerId,
+    username: String,
+    score: usize,
+    balls: usize,
+}
+
 /// Returns a list of players and their scores.
 ///
 /// This is used by new host connections to update thier display to match the current state of the
 /// game.
 #[get("/players")]
-pub fn get_players(
-    scoreboard: State<Mutex<Scoreboard>>,
-    usernames: State<Mutex<Usernames>>,
-) -> JSON<PlayersResponse> {
-    // Clone the scoreboard and usernames table so we can work on their data without holding the
-    // mutex for too long.
-    let scoreboard = scoreboard.lock().expect("Scoreboard mutex was poisoned").clone();
-    let mut usernames = usernames.lock().expect("Usernames mutex was poisoned").clone();
-
-    let players = usernames.drain()
-        .map(|(id, username)| {
-            let score = *scoreboard.get(&id).expect("Score for player was not in scoreboard");
-            PlayerData { id, username, score }
+pub fn get_players(players: State<PlayerMap>) -> JSON<PlayersResponse> {
+    let players = players.read().expect("Player map was poisoned!");
+    let players = players.values()
+        .map(|player| {
+            PlayerData {
+                id: player.id,
+                username: player.username.clone(),
+                score: player.score,
+                balls: player.balls,
+            }
         })
         .collect();
 
