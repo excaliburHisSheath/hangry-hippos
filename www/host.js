@@ -81,7 +81,7 @@ socket.onmessage = (event) => {
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on.
         let element = document.getElementById(hippo.player.id);
-        switch (hippo.side) {
+        switch (hippo.side.side) {
             case TOP_SIDE: {
                 TweenMax.fromTo(
                     element,
@@ -118,9 +118,24 @@ socket.onmessage = (event) => {
                 );
             } break;
 
-            default: throw new Error('Unrecognized hippo side: ' + hippo.side);
+            default: throw new Error('Unrecognized hippo side: ' + hippo.side.side);
         }
+    } else if (payload['PlayerLose']) {
+        let info = payload['PlayerLose'];
+
+        // Retreive the hippo and remove it from the hippo map.
+        let hippo = app.hippoMap[info.id];
+        assert(delete app.hippoMap[info.id], 'Unable to remove player for id ' + info.id);
+
+        // Remove the hippo from its side of the screen.
+        let index = hippo.side.array.indexOf(hippo);
+        hippo.side.array.splice(index, 1);
+    } else {
+        console.error('Unrecognized host event:', payload);
     }
+};
+socket.onclose = (event) => {
+    console.error('Socket closed:', event);
 };
 
 // When we first boot up we need to get the current list of players.
@@ -145,7 +160,7 @@ function registerPlayer(player) {
     // Create a hippo object for the player.
     let hippo = {
         player: player,
-        side: side.side,
+        side: side,
     };
 
     // Add the hippo to the hippo map and its side of the screen.

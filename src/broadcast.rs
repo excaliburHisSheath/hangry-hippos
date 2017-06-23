@@ -31,6 +31,10 @@ pub enum HostBroadcast {
         score: usize,
         balls: usize,
     },
+
+    PlayerLose {
+        id: PlayerId,
+    }
 }
 
 /// A message to be broadcast to connected player clients.
