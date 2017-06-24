@@ -3,9 +3,14 @@
 body {
     padding: 0;
     margin: 0;
+    overflow: hidden;
 }
 
 h1 {
+    margin: 0;
+}
+
+h2 {
     margin: 0;
 }
 
@@ -29,18 +34,47 @@ h1 {
     padding: 20px;
 }
 
-#centered-text {
+@media all and (orientation: portrait) {
+    * {
+        font-size: 5vw;
+    }
+}
+
+@media all and (orientation: landscape) {
+    * {
+        font-size: 5vh;
+    }
+}
+
+.screen {
     /* Center the text in the screen */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    width: 100%;
-
-    font-size: 5vw;
+    width: calc(100% - 40px);
 }
 
 #tap-text {
-    font-size: 10vw;
+    font-size: 200%;
+}
+
+#lose-screen {
+    font-size: 150%;
+}
+
+#game-over-text {
+    font-size: 200%;
+}
+
+#final-score-text {
+    padding-bottom: 30px;
+}
+
+button {
+    background-color: #bc00a6;
+    color: white;
+    border-style: none;
+    padding: 20px;
+    border-radius: 5px;
 }

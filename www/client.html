@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <meta name="apple-mobile-web-app-capable" content="yes">
 
-        <title>Hangry River Horse</title>
+        <title>HungryHipp.us</title>
 
         <!-- Development version of Vue.js, at some point use the release version. -->
         <script src="https://vuejs.org/js/vue.js"></script>
@@ -44,13 +44,17 @@
         <div id="app-root" v-on:click="feedMe">
             <h1>HungryHipp.us</h1>
 
-            <div id="centered-text">
-                <div>
-                    <h2>{{ username }}</h2>
-                </div>
+            <div id="game-screen" class="screen" v-if="isPlaying">
+                <h2>{{ username }}</h2>
                 <div id="tap-text">Tap anywhere to feed your hippo!</div>
                 <div id="score-text">Score: {{ score }}</div>
                 <div id="food-text">You have {{ balls }} balls available to feed your hippo!</div>
+            </div>
+
+            <div id="lose-screen" class="screen" v-if="!isPlaying">
+                <h2 id="game-over-text">Game Over</h2>
+                <div id="final-score-text">Your final score is {{ score }}.</div>
+                <button v-on:click.stop="reload">Play Again</button>
             </div>
         </div>
 

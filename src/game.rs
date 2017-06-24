@@ -204,8 +204,12 @@ pub fn start_game_loop(
 
                         true
                     } else {
-                        // Notify the hosts the the player lost.
+                        // Notify the hosts and players that the player lost.
                         host_broadcaster.send(HostBroadcast::PlayerLose { id });
+                        player_broadcaster.send(PlayerBroadcast::PlayerLose {
+                            id,
+                            score: player.score,
+                        });
 
                         // TODO: Notify the player that they lost.
 

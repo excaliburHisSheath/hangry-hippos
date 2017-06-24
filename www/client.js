@@ -9,10 +9,17 @@ let app = new Vue({
         username: null,
         score: null,
         balls: null,
+        isPlaying: true,
     },
 
     methods: {
         feedMe: function () {
+            // If the user taps after they've lost, don't do anything.
+            // TODO: Can we have Vue remove the binding when `isPlaying` is false?
+            if (!this.isPlaying) {
+                return;
+            }
+
             let payload = {
                 player: this.id,
             };
@@ -20,16 +27,26 @@ let app = new Vue({
             // Animate the text in the center of the screen to give the user some feedback when
             // they tap.
             TweenMax.fromTo(
-                '#centered-text',
+                '#tap-text',
                 0.1,
                 { scale: 1 },
                 { scale: 1.2, yoyo: true, repeat: 1 },
+            );
+            TweenMax.fromTo(
+                '#tap-text',
+                0.1,
+                { rotation: 0 },
+                { rotation: Math.random() * 6 - 3, yoyo: true, repeat: 1 },
             );
 
             post('api/feed-me', payload, response => {
                 this.balls = response.balls;
             });
         },
+
+        reload: function () {
+            window.location.reload(false);
+        }
     },
 });
 
@@ -41,11 +58,19 @@ socket.onmessage = function(event) {
     let payload = JSON.parse(event.data);
 
     if (payload['HippoEat']) {
-        let info = payload['HippoEat'];
-        if (info.id === app.id) {
-            app.score = info.score;
-            app.balls = info.balls;
+        let event = payload['HippoEat'];
+        if (event.id === app.id) {
+            app.score = event.score;
+            app.balls = event.balls;
         }
+    } else if (payload['PlayerLose']) {
+        let event = payload['PlayerLose'];
+        if (event.id === app.id) {
+            app.score = event.score;
+            app.isPlaying = false;
+        }
+    } else {
+        console.error('Unrecognized player event:', payload);
     }
 };
 
