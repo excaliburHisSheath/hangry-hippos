@@ -45,7 +45,7 @@
             <h1>HungryHipp.us</h1>
 
             <div id="game-screen" class="screen" v-if="isPlaying">
-                <h2>{{ username }}</h2>
+                <h2 class="hippo-name">{{ username }}</h2>
                 <div id="tap-text">Tap anywhere to feed your hippo!</div>
                 <div id="score-text">Score: {{ score }}</div>
                 <div id="food-text">You have {{ balls }} balls available to feed your hippo!</div>
@@ -53,6 +53,7 @@
 
             <div id="lose-screen" class="screen" v-if="!isPlaying">
                 <h2 id="game-over-text">Game Over</h2>
+                <div id="game-over-message">Your hippo <span class="hippo-name">{{ username }}</span> ran out of colorful balls to eat.</div>
                 <div id="final-score-text">Your final score is {{ score }}.</div>
                 <button v-on:click.stop="reload">Play Again</button>
             </div>
