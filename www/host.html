@@ -43,10 +43,7 @@
                 <hippo-head
                     v-for="hippo in topHippos"
                     :key="hippo.player.id"
-                    v-bind:name="hippo.player.username"
-                    v-bind:score="hippo.player.score"
-                    v-bind:id="hippo.player.id"
-                    v-bind:balls="hippo.player.balls"
+                    v-bind:hippo="hippo"
                 ></hippo-head>
             </div>
 
@@ -54,36 +51,23 @@
                 <hippo-head
                     v-for="hippo in rightHippos"
                     :key="hippo.player.id"
-                    v-bind:name="hippo.player.username"
-                    v-bind:score="hippo.player.score"
-                    v-bind:id="hippo.player.id"
-                    v-bind:balls="hippo.player.balls"
-                >
-                </hippo-head>
+                    v-bind:hippo="hippo"
+                ></hippo-head>
             </div>
 
             <div id="bottom-side" class="horizontal-side">
                 <hippo-head
                     v-for="hippo in bottomHippos"
                     :key="hippo.player.id"
-                    v-bind:name="hippo.player.username"
-                    v-bind:score="hippo.player.score"
-                    v-bind:id="hippo.player.id"
-                    v-bind:balls="hippo.player.balls"
-                >
-                </hippo-head>
+                ></hippo-head>
             </div>
 
             <div id="left-side" class="vertical-side">
                 <hippo-head
                     v-for="hippo in leftHippos"
                     :key="hippo.player.id"
-                    v-bind:name="hippo.player.username"
-                    v-bind:score="hippo.player.score"
-                    v-bind:id="hippo.player.id"
-                    v-bind:balls="hippo.player.balls"
-                >
-                </hippo-head>
+                    v-bind:hippo="hippo"
+                ></hippo-head>
             </div>
         </div>
 

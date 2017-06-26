@@ -5,6 +5,8 @@ const RIGHT_SIDE = 1;
 const BOTTOM_SIDE = 2;
 const LEFT_SIDE = 3;
 
+let marbleCounter = 0;
+
 // Initialize the VueJS app. This is used for app rendering.
 let app = new Vue({
     el: '#vue-root',
@@ -22,17 +24,45 @@ let app = new Vue({
 });
 
 Vue.component('hippo-head', {
-    props: ['name', 'score', 'id', 'balls'],
+    props: ['hippo'],
+
     template: `
     <div class="hippo-head">
         <div class="hippo-text">
-            <div class="hippo-name">{{ name }}</div>
-            <div class="hippo-score">Score: {{ score }}</div>
-            <div class="hippo=balls">Balls: {{ balls }}</div>
+            <div class="hippo-name">{{ hippo.player.name }}</div>
+            <div class="hippo-score">Score: {{ hippo.player.score }}</div>
+            <div class="hippo=balls">Balls: {{ hippo.player.balls }}</div>
         </div>
-        <img src="assets/hippo.jpg" class="hippo-head-image" :id="id">
+        <div class="food-pile">
+            <transition-group v-on:enter="enter" v-bind:css="false">
+                <div class="marble" v-for="marble in hippo.marbles" :key="marble.key"></div>
+            </transition-group>
+        </div>
+        <img src="assets/hippo.jpg" class="hippo-head-image" :id="hippo.player.id">
     </div>
     `,
+
+    methods: {
+        enter: function (element, doneProc) {
+            let x = Math.random() * 100 - 50;
+            let y = Math.random() * 100 - 50;
+            TweenMax.fromTo(
+                element,
+                0.5,
+                {
+                    x: x * 3,
+                    y: y * 3,
+                    opacity: 0.3,
+                },
+                {
+                    x: x,
+                    y: y,
+                    opacity: 1,
+                    onComplete: doneProc,
+                },
+            );
+        },
+    },
 });
 
 // Helpers to allow us to place hippos in clockwise order. By cycling through this array, we choose
@@ -67,6 +97,13 @@ socket.onmessage = (event) => {
         assert(hippo != null, 'Unable to find hippo for ID: ' + info.id);
 
         hippo.player.balls = info.balls;
+
+        while (hippo.marbles.length < info.balls) {
+            hippo.marbles.push({
+                key: marbleCounter,
+            });
+            marbleCounter += 1;
+        }
     } else if (payload['HippoEat']) {
         let info = payload['HippoEat'];
 
@@ -77,6 +114,10 @@ socket.onmessage = (event) => {
         // Updated the local score for the player.
         hippo.player.score = info.score;
         hippo.player.balls = info.balls;
+
+        while (hippo.marbles.length > info.balls) {
+            hippo.marbles.splice(0, 1);
+        }
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on.
@@ -129,7 +170,6 @@ socket.onmessage = (event) => {
 
         // Remove the hippo from its side of the screen.
         let index = hippo.side.array.indexOf(hippo);
-        hippo.side.array.splice(index, 1);
     } else {
         console.error('Unrecognized host event:', payload);
     }
@@ -157,10 +197,19 @@ function registerPlayer(player) {
     let side = SIDES[currentSide];
     currentSide = (currentSide + 1) % SIDES.length;
 
+    let marbles = [];
+    for (let count = 0; count < player.balls; count += 1) {
+        marbles.push({
+            key: marbleCounter,
+        });
+        marbleCounter += 1;
+    }
+
     // Create a hippo object for the player.
     let hippo = {
         player: player,
         side: side,
+        marbles: marbles,
     };
 
     // Add the hippo to the hippo map and its side of the screen.
