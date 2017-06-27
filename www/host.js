@@ -48,16 +48,20 @@ Vue.component('hippo-head', {
             let y = Math.random() * 100 - 50;
             TweenMax.fromTo(
                 element,
-                0.5,
+                0.8,
                 {
                     x: x * 3,
                     y: y * 3,
                     opacity: 0.3,
+                    scale: 3.0,
                 },
                 {
                     x: x,
                     y: y,
                     opacity: 1,
+                    scale: 1,
+
+                    ease: Bounce.easeOut,
                     onComplete: doneProc,
                 },
             );
