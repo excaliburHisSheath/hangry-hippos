@@ -34,7 +34,7 @@ Vue.component('hippo-head', {
         <div class="hippo-text">
             <div class="hippo-name">{{ hippo.player.name }}</div>
             <div class="hippo-score">Score: {{ hippo.player.score }}</div>
-            <div class="hippo=balls">Marbles: {{ hippo.marbles.length }}</div>
+            <div class="hippo=marbles">Marbles: {{ hippo.marbles.length }}</div>
         </div>
         <div class="food-pile">
             <transition-group v-on:enter="enter" v-bind:css="false">

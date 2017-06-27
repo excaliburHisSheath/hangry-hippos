@@ -29,9 +29,9 @@ pub enum HostBroadcast {
         marbles: Vec<Marble>,
     },
 
-    /// A player has added a ball to their food pile.
+    /// A player has added a marble to their food pile.
     AddMarble {
-        /// The ID of the player who got the ball.
+        /// The ID of the player who got the marble.
         id: PlayerId,
 
         /// The marble that was added to the food pile.
@@ -43,9 +43,9 @@ pub enum HostBroadcast {
         num_marbles: usize,
     },
 
-    /// A hippo has eaten a ball from their food pile.
+    /// A hippo has eaten a marble from their food pile.
     HippoEat {
-        /// The ID for the player whose hippo ate the ball.
+        /// The ID for the player whose hippo ate the marble.
         id: PlayerId,
 
         /// The player's total score.
@@ -71,7 +71,7 @@ pub enum HostBroadcast {
 /// A message to be broadcast to connected player clients.
 #[derive(Debug, Serialize)]
 pub enum PlayerBroadcast {
-    /// A hippos has eaten a ball from their food pile.
+    /// A hippos has eaten a marble from their food pile.
     HippoEat {
         /// The ID for the player that this event applies to.
         id: PlayerId,

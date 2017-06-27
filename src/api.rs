@@ -13,7 +13,7 @@ pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
     pub username: String,
-    pub marbles: Vec<Marble>,
+    pub num_marbles: usize,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -29,6 +29,7 @@ pub fn register_player(
     let id = player_id_generator.next_id();
     let username = game::generate_username();
     let marbles: Vec<Marble> = (0..10).map(|_| marble_generator.create_marble()).collect();
+    let num_marbles = marbles.len();
 
     let player = Player {
         id,
@@ -50,14 +51,14 @@ pub fn register_player(
         id,
         username: username.clone(),
         score: 0,
-        marbles: marbles.clone(),
+        marbles: marbles,
     });
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id,
         username,
-        marbles,
+        num_marbles,
     })
 }
 

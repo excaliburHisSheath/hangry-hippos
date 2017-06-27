@@ -138,7 +138,7 @@ pub struct Player {
     /// The player's current score.
     pub score: usize,
 
-    /// The time at which the player's hippo will next eat a ball.
+    /// The time at which the player's hippo will next eat a marble.
     pub next_eat_time: Instant,
 
     /// The set of marbles in the player's food pile.
