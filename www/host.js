@@ -1,5 +1,8 @@
 'use strict';
 
+// GIVE ME TAU OR GIVE ME DEATH!
+Math.TAU = 2 * Math.PI;
+
 const TOP_SIDE = 0;
 const RIGHT_SIDE = 1;
 const BOTTOM_SIDE = 2;
@@ -44,21 +47,21 @@ Vue.component('hippo-head', {
 
     methods: {
         enter: function (element, doneProc) {
-            let x = Math.random() * 100 - 50;
-            let y = Math.random() * 100 - 50;
+            let angle = Math.random() * Math.TAU;
+            let radius = Math.random() * 40;
             TweenMax.fromTo(
                 element,
                 0.8,
                 {
-                    x: x * 3,
-                    y: y * 3,
+                    x: Math.cos(angle) * radius * 3,
+                    y: Math.sin(angle) * radius * 3,
                     opacity: 0.3,
                     scale: 3.0,
                     zIndex: 10,
                 },
                 {
-                    x: x,
-                    y: y,
+                    x: Math.cos(angle) * radius,
+                    y: Math.sin(angle) * radius,
                     opacity: 1,
                     scale: 1,
                     zIndex: 0,
