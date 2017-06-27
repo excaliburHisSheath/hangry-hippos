@@ -54,12 +54,14 @@ Vue.component('hippo-head', {
                     y: y * 3,
                     opacity: 0.3,
                     scale: 3.0,
+                    zIndex: 10,
                 },
                 {
                     x: x,
                     y: y,
                     opacity: 1,
                     scale: 1,
+                    zIndex: 0,
 
                     ease: Bounce.easeOut,
                     onComplete: doneProc,
