@@ -8,7 +8,7 @@ let app = new Vue({
         id: null,
         username: null,
         score: null,
-        balls: null,
+        numMarbles: null,
         isPlaying: true,
     },
 
@@ -40,7 +40,7 @@ let app = new Vue({
             );
 
             post('api/feed-me', payload, response => {
-                this.balls = response.balls;
+                this.numMarbles = response.num_marbles;
             });
         },
 
@@ -61,7 +61,7 @@ socket.onmessage = function(event) {
         let event = payload['HippoEat'];
         if (event.id === app.id) {
             app.score = event.score;
-            app.balls = event.balls;
+            app.numMarbles = event.num_marbles;
         }
     } else if (payload['PlayerLose']) {
         let event = payload['PlayerLose'];
@@ -88,5 +88,5 @@ get('api/register-player', response => {
     app.id = response.id;
     app.username = response.username;
     app.score = 0;
-    app.balls = response.balls;
+    app.numMarbles = response.num_marbles;
 });

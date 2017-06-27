@@ -25,29 +25,41 @@ pub enum HostBroadcast {
         /// The starting score for the player.
         score: usize,
 
-        /// The starting number of balls in the player's food pile.
-        balls: usize,
+        /// The set of marbles that make the player's initial food pile.
+        marbles: Vec<Marble>,
     },
 
-    /// A player has added a ball to their food pile.
-    AddBall {
-        /// The ID of the player who got the ball.
+    /// A player has added a marble to their food pile.
+    AddMarble {
+        /// The ID of the player who got the marble.
         id: PlayerId,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The marble that was added to the food pile.
+        marble: Marble,
+
+        /// The total number of marbles in the food pile currently.
+        ///
+        /// To be used by the host site for sanity checking.
+        num_marbles: usize,
     },
 
-    /// A hippo has eaten a ball from their food pile.
+    /// A hippo has eaten a marble from their food pile.
     HippoEat {
-        /// The ID for the player whose hippo ate the ball.
+        /// The ID for the player whose hippo ate the marble.
         id: PlayerId,
 
         /// The player's total score.
         score: usize,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The key for the marble was eaten.
+        ///
+        /// Used by the host to remove the marble from the display.
+        marble_key: usize,
+
+        /// The total number of marbles in the food pile currently.
+        ///
+        /// To be used by the host site for sanity checking.
+        num_marbles: usize,
     },
 
     /// A player has lost the game and should be removed from the display.
@@ -59,7 +71,7 @@ pub enum HostBroadcast {
 /// A message to be broadcast to connected player clients.
 #[derive(Debug, Serialize)]
 pub enum PlayerBroadcast {
-    /// A hippos has eaten a ball from their food pile.
+    /// A hippos has eaten a marble from their food pile.
     HippoEat {
         /// The ID for the player that this event applies to.
         id: PlayerId,
@@ -67,8 +79,8 @@ pub enum PlayerBroadcast {
         /// The player's current score.
         score: usize,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The current number of marbles in the player's food pile.
+        num_marbles: usize,
     },
 
     /// A player has lost the game and has been removed.

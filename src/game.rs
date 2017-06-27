@@ -42,19 +42,10 @@ impl Deserialize for PlayerId {
 ///
 /// Meant to be managed as application state by Rocket. Only one should ever be created, and Rocket
 /// ensures that only one can ever be registered as managed state.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PlayerIdGenerator(AtomicUsize);
 
 impl PlayerIdGenerator {
-    /// Creates a new `PlayerIdGenerator`.
-    ///
-    /// Only one `PlayerIdGenerator` should be created in the lifetime of the application. A single
-    /// generator will never create duplicate IDs, but if there are multiple generators will
-    /// produce the same IDs.
-    pub fn new() -> PlayerIdGenerator {
-        PlayerIdGenerator(ATOMIC_USIZE_INIT)
-    }
-
     /// Generate a unique ID for a player.
     pub fn next_id(&self) -> PlayerId {
         PlayerId(self.0.fetch_add(1, Ordering::Relaxed))
@@ -188,14 +179,51 @@ pub struct Player {
     /// The player's current score.
     pub score: usize,
 
-    /// The number of balls in the player's food pile.
-    pub balls: usize,
-
-    /// The time at which the player's hippo will next eat a ball.
+    /// The time at which the player's hippo will next eat a marble.
     pub next_eat_time: Instant,
+
+    /// The set of marbles in the player's food pile.
+    pub marbles: Vec<Marble>,
 }
 
 pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Marble {
+    key: usize,
+
+    // HACK: We should be using a type-safe RGB color type, but we don't yet have a smart way for
+    // generating CSS-friendly color strings (which should probably happen when we serialize to
+    // JSON). Once we have a good way of generating color values, convert this to a better type.
+    color: String,
+    angle: f64,
+    radius: f64,
+}
+
+#[derive(Debug, Default)]
+pub struct MarbleGenerator(AtomicUsize);
+
+impl MarbleGenerator {
+    pub fn create_marble(&self) -> Marble {
+        static COLORS: &'static [&'static str] = &[
+            "red",
+            "black",
+            "blue",
+            "orchid",
+            "purple",
+            "orange",
+            "yellow",
+            "green",
+        ];
+
+        Marble {
+            key: self.0.fetch_add(1, Ordering::Relaxed),
+            color: thread_rng().choose(COLORS).unwrap().to_string(),
+            angle: random::<f64>() * 2.0 * ::std::f64::consts::PI,
+            radius: random(),
+        }
+    }
+}
 
 /// Runs the main logic of the game on a separate thread.
 ///
@@ -218,31 +246,34 @@ pub fn start_game_loop(
                     // Ignore hippos that are not ready to eat.
                     if now < player.next_eat_time { return true; }
 
-
-                    // Try to eat a ball. If there's one for the hippo to eat, we get a point.
+                    // Try to eat a marble. If there's one for the hippo to eat, we get a point.
                     // Otherwise, the hippo is le dead.
-                    if player.balls > 0 {
-                        // Eat a ball, get a point.
-                        player.balls -= 1;
+                    if player.marbles.len() > 0 {
+                        // Eat a marble, get a point.
+                        let removed = player.marbles.remove(0);
                         player.score += 1;
+
+                        // Remove the marble from the player's food pile.
 
                         // Broadcast the new score to all hosts.
                         host_broadcaster.send(HostBroadcast::HippoEat {
                             id,
                             score: player.score,
-                            balls: player.balls,
+                            marble_key: removed.key,
+                            num_marbles: player.marbles.len(),
                         });
 
                         // Broadcast the new score to all players.
                         player_broadcaster.send(PlayerBroadcast::HippoEat {
                             id,
                             score: player.score,
-                            balls: player.balls,
+                            num_marbles: player.marbles.len(),
                         });
 
                         // Determine the next time the player's hippo will eat.
                         player.next_eat_time += Duration::from_millis(750);
 
+                        // Keep the player in the players map.
                         true
                     } else {
                         // Notify the hosts and players that the player lost.
@@ -251,8 +282,6 @@ pub fn start_game_loop(
                             id,
                             score: player.score,
                         });
-
-                        // TODO: Notify the player that they lost.
 
                         // Remove the player from the players map.
                         false

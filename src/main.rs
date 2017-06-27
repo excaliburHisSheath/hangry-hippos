@@ -72,7 +72,8 @@ fn main() {
             api::feed_player,
             api::get_players,
         ])
-        .manage(PlayerIdGenerator::new())
+        .manage(PlayerIdGenerator::default())
+        .manage(MarbleGenerator::default())
         .manage(players)
         .manage(host_broadcaster)
         .manage(player_broadcaster)

@@ -13,7 +13,7 @@ pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
     pub username: String,
-    pub balls: usize,
+    pub num_marbles: usize,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -21,19 +21,21 @@ pub struct RegisterPlayerResponse {
 #[get("/register-player")]
 pub fn register_player(
     player_id_generator: State<PlayerIdGenerator>,
+    marble_generator: State<MarbleGenerator>,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
 ) -> JSON<RegisterPlayerResponse>
 {
     let id = player_id_generator.next_id();
     let username = game::generate_username();
-    let balls = 10;
+    let marbles: Vec<Marble> = (0..10).map(|_| marble_generator.create_marble()).collect();
+    let num_marbles = marbles.len();
 
     let player = Player {
         id,
         username: username.clone(),
         score: 0,
-        balls,
+        marbles: marbles.clone(),
         next_eat_time: Instant::now() + Duration::from_millis(1000),
     };
 
@@ -49,14 +51,14 @@ pub fn register_player(
         id,
         username: username.clone(),
         score: 0,
-        balls,
+        marbles: marbles,
     });
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id,
         username,
-        balls,
+        num_marbles,
     })
 }
 
@@ -69,8 +71,8 @@ pub struct FeedPlayerRequest {
 
 /// The response sent back from the `/feed-me` endpoint.
 #[derive(Debug, Serialize)]
-pub struct FeedPlayerResponse {
-    balls: usize,
+pub struct AddMarbleResponse {
+    num_marbles: usize,
 }
 
 /// Feeds a player's hippo, increasing the player's score.
@@ -83,14 +85,16 @@ pub struct FeedPlayerResponse {
 pub fn feed_player(
     payload: JSON<FeedPlayerRequest>,
     players: State<PlayerMap>,
+    marble_generator: State<MarbleGenerator>,
     broadcaster: State<HostBroadcaster>,
-) -> Result<JSON<FeedPlayerResponse>>
+) -> Result<JSON<AddMarbleResponse>>
 {
     let payload = payload.into_inner();
     let id = payload.player;
 
     // Add 1 to the player's score, returning the new score.
-    let balls = {
+    let marble = marble_generator.create_marble();
+    let num_marbles = {
         let mut players = players.write().expect("Players were poisoned");
 
         // Get the player's current score, or return an `InvalidPlayer` error if it's not in
@@ -98,13 +102,14 @@ pub fn feed_player(
         let player = players
             .get_mut(&id)
             .ok_or(Error::InvalidPlayer(id))?;
-        player.balls += 1;
-        player.balls
+
+        player.marbles.push(marble.clone());
+        player.marbles.len()
     };
 
     // Update the host displays and respond to the player.
-    broadcaster.send(HostBroadcast::AddBall { id, balls });
-    Ok(JSON(FeedPlayerResponse { balls }))
+    broadcaster.send(HostBroadcast::AddMarble { id, marble, num_marbles });
+    Ok(JSON(AddMarbleResponse { num_marbles }))
 }
 
 /// The response sent back from the `/scoreboard` endpoint.
@@ -131,8 +136,8 @@ pub struct PlayerData {
     /// The player's current score.
     score: usize,
 
-    /// The total number of balls in the players food pile.
-    balls: usize,
+    /// The set of marbles in the player's food pile.
+    marbles: Vec<Marble>,
 }
 
 /// Returns a list of players and their scores.
@@ -148,7 +153,7 @@ pub fn get_players(players: State<PlayerMap>) -> JSON<PlayersResponse> {
                 id: player.id,
                 username: player.username.clone(),
                 score: player.score,
-                balls: player.balls,
+                marbles: player.marbles.clone(),
             }
         })
         .collect();

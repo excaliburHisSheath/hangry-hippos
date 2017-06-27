@@ -103,10 +103,36 @@ body {
     z-index: 1;
 }
 
+.food-pile {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+}
+
+.marble {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+
+    background-color: blue;
+}
+
+/* Top side styles. */
 #top-side .hippo-text {
     top: 200px;
 }
 
+#top-side .food-pile {
+    top: 100px;
+}
+
+/* Right side styles. */
 #right-side .hippo-text {
     right: 200px;
 }
@@ -115,6 +141,11 @@ body {
     transform: rotate(90deg);
 }
 
+#right-side .food-pile {
+    right: 100px;
+}
+
+/* Bottom side styles. */
 #bottom-side .hippo-text {
     bottom: 200px;
 }
@@ -123,12 +154,21 @@ body {
     transform: rotate(180deg);
 }
 
+#bottom-side .food-pile {
+    bottom: 100px;
+}
+
+/* Left side styles. */
 #left-side .hippo-text {
     left: 200px;
 }
 
 #left-side .hippo-head-image {
     transform: rotate(-90deg);
+}
+
+#left-side .food-pile {
+    left: 100px;
 }
 
 #attract-message {
