@@ -8,8 +8,6 @@ const RIGHT_SIDE = 1;
 const BOTTOM_SIDE = 2;
 const LEFT_SIDE = 3;
 
-let marbleCounter = 0;
-
 // Initialize the VueJS app. This is used for app rendering.
 let app = new Vue({
     el: '#vue-root',
@@ -38,7 +36,14 @@ Vue.component('hippo-head', {
         </div>
         <div class="food-pile">
             <transition-group v-on:enter="enter" v-bind:css="false">
-                <div class="marble" v-for="marble in hippo.marbles" :key="marble.key" v-bind:style="{ backgroundColor: marble.color }"></div>
+                <div
+                    class="marble"
+                    v-for="marble in hippo.marbles"
+                    :key="marble.key"
+                    v-bind:style="{ backgroundColor: marble.color, transform: 'translate(' + marble.x + 'px, ' + marble.y + 'px)' }"
+                    v-bind:x="marble.x"
+                    v-bind:y="marble.y"
+                ></div>
             </transition-group>
         </div>
         <img src="assets/hippo.jpg" class="hippo-head-image" :id="hippo.player.id">
@@ -46,28 +51,21 @@ Vue.component('hippo-head', {
     `,
 
     methods: {
-        enter: function (element, doneProc) {
-            let angle = Math.random() * Math.TAU;
-            let radius = Math.random() * 40;
-            TweenMax.fromTo(
+        enter: function (element, done) {
+            let x = Number(element.getAttribute('x'));
+            let y = Number(element.getAttribute('y'));
+
+            TweenMax.from(
                 element,
                 0.8,
                 {
-                    x: Math.cos(angle) * radius * 3,
-                    y: Math.sin(angle) * radius * 3,
+                    x: x * 3,
+                    y: y * 3,
                     opacity: 0.3,
                     scale: 3.0,
                     zIndex: 10,
-                },
-                {
-                    x: Math.cos(angle) * radius,
-                    y: Math.sin(angle) * radius,
-                    opacity: 1,
-                    scale: 1,
-                    zIndex: 0,
-
                     ease: Bounce.easeOut,
-                    onComplete: doneProc,
+                    onComplete: done,
                 },
             );
         },
@@ -108,11 +106,7 @@ socket.onmessage = (event) => {
         hippo.player.balls = info.balls;
 
         while (hippo.marbles.length < info.balls) {
-            hippo.marbles.push({
-                key: marbleCounter,
-                color: randomMarbleColor(),
-            });
-            marbleCounter += 1;
+            hippo.marbles.push(generateMable());
         }
     } else if (payload['HippoEat']) {
         let info = payload['HippoEat'];
@@ -210,11 +204,7 @@ function registerPlayer(player) {
 
     let marbles = [];
     for (let count = 0; count < player.balls; count += 1) {
-        marbles.push({
-            key: marbleCounter,
-            color: randomMarbleColor(),
-        });
-        marbleCounter += 1;
+        marbles.push(generateMable());
     }
 
     // Create a hippo object for the player.
@@ -230,12 +220,13 @@ function registerPlayer(player) {
     side.array.push(hippo);
 }
 
-function randomMarbleColor() {
+let MARBLE_COUNTER = 0;
+const MARBLE_PILE_RADIUS = 40;
+function generateMable() {
     const COLORS = [
         'red',
         'black',
         'blue',
-        'violet',
         'orchid',
         'purple',
         'orange',
@@ -243,7 +234,22 @@ function randomMarbleColor() {
         'green',
     ];
 
-    return COLORS[Math.floor(Math.random() * COLORS.length)];
+    let key = MARBLE_COUNTER;
+    MARBLE_COUNTER += 1;
+
+    let color = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+    let angle = Math.random() * Math.TAU;
+    let radius = Math.random();
+
+    return {
+        key: key,
+        color: color,
+        angle: angle,
+        radius: radius,
+        x: Math.cos(angle) * radius * MARBLE_PILE_RADIUS,
+        y: Math.sin(angle) * radius * MARBLE_PILE_RADIUS,
+    }
 }
 
 // Start the attract an
