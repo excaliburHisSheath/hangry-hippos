@@ -38,7 +38,7 @@ Vue.component('hippo-head', {
         </div>
         <div class="food-pile">
             <transition-group v-on:enter="enter" v-bind:css="false">
-                <div class="marble" v-for="marble in hippo.marbles" :key="marble.key"></div>
+                <div class="marble" v-for="marble in hippo.marbles" :key="marble.key" v-bind:style="{ backgroundColor: marble.color }"></div>
             </transition-group>
         </div>
         <img src="assets/hippo.jpg" class="hippo-head-image" :id="hippo.player.id">
@@ -110,6 +110,7 @@ socket.onmessage = (event) => {
         while (hippo.marbles.length < info.balls) {
             hippo.marbles.push({
                 key: marbleCounter,
+                color: randomMarbleColor(),
             });
             marbleCounter += 1;
         }
@@ -179,6 +180,7 @@ socket.onmessage = (event) => {
 
         // Remove the hippo from its side of the screen.
         let index = hippo.side.array.indexOf(hippo);
+        hippo.side.array.splice(index, 1);
     } else {
         console.error('Unrecognized host event:', payload);
     }
@@ -210,6 +212,7 @@ function registerPlayer(player) {
     for (let count = 0; count < player.balls; count += 1) {
         marbles.push({
             key: marbleCounter,
+            color: randomMarbleColor(),
         });
         marbleCounter += 1;
     }
@@ -225,6 +228,22 @@ function registerPlayer(player) {
     assert(app.hippoMap[player.id] == null, 'Hippo already exists for ID: ' + player.id);
     app.hippoMap[player.id] = hippo;
     side.array.push(hippo);
+}
+
+function randomMarbleColor() {
+    const COLORS = [
+        'red',
+        'black',
+        'blue',
+        'violet',
+        'orchid',
+        'purple',
+        'orange',
+        'yellow',
+        'green',
+    ];
+
+    return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
 // Start the attract an
