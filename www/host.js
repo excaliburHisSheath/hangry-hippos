@@ -223,16 +223,6 @@ function registerPlayer(player) {
 let MARBLE_COUNTER = 0;
 const MARBLE_PILE_RADIUS = 40;
 function generateMable() {
-    const COLORS = [
-        'red',
-        'black',
-        'blue',
-        'orchid',
-        'purple',
-        'orange',
-        'yellow',
-        'green',
-    ];
 
     let key = MARBLE_COUNTER;
     MARBLE_COUNTER += 1;

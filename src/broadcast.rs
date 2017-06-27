@@ -25,8 +25,8 @@ pub enum HostBroadcast {
         /// The starting score for the player.
         score: usize,
 
-        /// The starting number of balls in the player's food pile.
-        balls: usize,
+        /// The set of marbles that make the player's initial food pile.
+        marbles: Vec<Marble>,
     },
 
     /// A player has added a ball to their food pile.

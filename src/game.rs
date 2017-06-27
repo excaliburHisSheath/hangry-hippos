@@ -42,19 +42,10 @@ impl Deserialize for PlayerId {
 ///
 /// Meant to be managed as application state by Rocket. Only one should ever be created, and Rocket
 /// ensures that only one can ever be registered as managed state.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PlayerIdGenerator(AtomicUsize);
 
 impl PlayerIdGenerator {
-    /// Creates a new `PlayerIdGenerator`.
-    ///
-    /// Only one `PlayerIdGenerator` should be created in the lifetime of the application. A single
-    /// generator will never create duplicate IDs, but if there are multiple generators will
-    /// produce the same IDs.
-    pub fn new() -> PlayerIdGenerator {
-        PlayerIdGenerator(ATOMIC_USIZE_INIT)
-    }
-
     /// Generate a unique ID for a player.
     pub fn next_id(&self) -> PlayerId {
         PlayerId(self.0.fetch_add(1, Ordering::Relaxed))
@@ -147,14 +138,51 @@ pub struct Player {
     /// The player's current score.
     pub score: usize,
 
-    /// The number of balls in the player's food pile.
-    pub balls: usize,
-
     /// The time at which the player's hippo will next eat a ball.
     pub next_eat_time: Instant,
+
+    /// The set of marbles in the player's food pile.
+    pub marbles: Vec<Marble>,
 }
 
 pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
+
+#[derive(Debug, Serialize)]
+pub struct Marble {
+    key: usize,
+
+    // HACK: We should be using a type-safe RGB color type, but we don't yet have a smart way for
+    // generating CSS-friendly color strings (which should probably happen when we serialize to
+    // JSON). Once we have a good way of generating color values, convert this to a better type.
+    color: String,
+    angle: f64,
+    radius: f64,
+}
+
+#[derive(Debug, Default)]
+pub struct MarbleGenerator(AtomicUsize);
+
+impl MarbleGenerator {
+    pub fn create_marble(&self) -> Marble {
+        static COLORS: &'static [&'static str] = &[
+            "red",
+            "black",
+            "blue",
+            "orchid",
+            "purple",
+            "orange",
+            "yellow",
+            "green",
+        ];
+
+        Marble {
+            key: self.0.fetch_add(1, Ordering::Relaxed),
+            color: thread_rng().choose(COLORS).unwrap().to_string(),
+            angle: random() * 2.0 * ::std::f64::consts::PI,
+            radius: random(),
+        }
+    }
+}
 
 /// Runs the main logic of the game on a separate thread.
 ///

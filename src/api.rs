@@ -13,7 +13,7 @@ pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
     pub username: String,
-    pub balls: usize,
+    pub marbles: Vec<Marble>,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -21,19 +21,20 @@ pub struct RegisterPlayerResponse {
 #[get("/register-player")]
 pub fn register_player(
     player_id_generator: State<PlayerIdGenerator>,
+    marble_generator: State<MarbleGenerator>,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
 ) -> JSON<RegisterPlayerResponse>
 {
     let id = player_id_generator.next_id();
     let username = game::generate_username();
-    let balls = 10;
+    let marbles = (0..10).map(|_| marble_generator.create_marble()).collect();
 
     let player = Player {
         id,
         username: username.clone(),
         score: 0,
-        balls,
+        marbles: marbles.clone(),
         next_eat_time: Instant::now() + Duration::from_millis(1000),
     };
 
@@ -49,14 +50,14 @@ pub fn register_player(
         id,
         username: username.clone(),
         score: 0,
-        balls,
+        marbles: marbles.clone(),
     });
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id,
         username,
-        balls,
+        marbles,
     })
 }
 
