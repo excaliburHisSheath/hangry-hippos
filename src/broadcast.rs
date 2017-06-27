@@ -30,12 +30,17 @@ pub enum HostBroadcast {
     },
 
     /// A player has added a ball to their food pile.
-    AddBall {
+    AddMarble {
         /// The ID of the player who got the ball.
         id: PlayerId,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The marble that was added to the food pile.
+        marble: Marble,
+
+        /// The total number of marbles in the food pile currently.
+        ///
+        /// To be used by the host site for sanity checking.
+        num_marbles: usize,
     },
 
     /// A hippo has eaten a ball from their food pile.
@@ -46,8 +51,15 @@ pub enum HostBroadcast {
         /// The player's total score.
         score: usize,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The key for the marble was eaten.
+        ///
+        /// Used by the host to remove the marble from the display.
+        marble_key: usize,
+
+        /// The total number of marbles in the food pile currently.
+        ///
+        /// To be used by the host site for sanity checking.
+        num_marbles: usize,
     },
 
     /// A player has lost the game and should be removed from the display.
@@ -67,8 +79,8 @@ pub enum PlayerBroadcast {
         /// The player's current score.
         score: usize,
 
-        /// The total number of balls in the player's food pile.
-        balls: usize,
+        /// The current number of marbles in the player's food pile.
+        num_marbles: usize,
     },
 
     /// A player has lost the game and has been removed.

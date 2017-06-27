@@ -32,7 +32,7 @@ Vue.component('hippo-head', {
         <div class="hippo-text">
             <div class="hippo-name">{{ hippo.player.name }}</div>
             <div class="hippo-score">Score: {{ hippo.player.score }}</div>
-            <div class="hippo=balls">Balls: {{ hippo.player.balls }}</div>
+            <div class="hippo=balls">Marbles: {{ hippo.marbles.length }}</div>
         </div>
         <div class="food-pile">
             <transition-group v-on:enter="enter" v-bind:css="false">
@@ -96,18 +96,15 @@ socket.onmessage = (event) => {
 
     if (payload['PlayerRegister']) {
         registerPlayer(payload['PlayerRegister']);
-    } else if (payload['AddBall']) {
-        let info = payload['AddBall'];
+    } else if (payload['AddMarble']) {
+        let info = payload['AddMarble'];
 
         // Find the hippo/player for the player that scored.
         let hippo = app.hippoMap[info.id];
         assert(hippo != null, 'Unable to find hippo for ID: ' + info.id);
 
-        hippo.player.balls = info.balls;
-
-        while (hippo.marbles.length < info.balls) {
-            hippo.marbles.push(generateMable());
-        }
+        hippo.marbles.push(generateMable(info.marble));
+        assert(hippo.marbles.length === info.num_marbles, 'Hippo marbles out of sync with server');
     } else if (payload['HippoEat']) {
         let info = payload['HippoEat'];
 
@@ -117,11 +114,12 @@ socket.onmessage = (event) => {
 
         // Updated the local score for the player.
         hippo.player.score = info.score;
-        hippo.player.balls = info.balls;
 
-        while (hippo.marbles.length > info.balls) {
-            hippo.marbles.splice(0, 1);
-        }
+        // Remove the eaten marble.
+        let index = hippo.marbles.findIndex(marble => marble.key === info.marble_key);
+        assert(index >= 0, 'Eaten marble was not in food pile');
+        hippo.marbles.splice(index, 1);
+        assert(hippo.marbles.length === info.num_marbles, 'Hippo marbles out of sync with server');
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on.
@@ -203,8 +201,8 @@ function registerPlayer(player) {
     currentSide = (currentSide + 1) % SIDES.length;
 
     let marbles = [];
-    for (let count = 0; count < player.balls; count += 1) {
-        marbles.push(generateMable());
+    for (let marble of player.marbles) {
+        marbles.push(generateMable(marble));
     }
 
     // Create a hippo object for the player.
@@ -220,25 +218,15 @@ function registerPlayer(player) {
     side.array.push(hippo);
 }
 
-let MARBLE_COUNTER = 0;
 const MARBLE_PILE_RADIUS = 40;
-function generateMable() {
-
-    let key = MARBLE_COUNTER;
-    MARBLE_COUNTER += 1;
-
-    let color = COLORS[Math.floor(Math.random() * COLORS.length)];
-
-    let angle = Math.random() * Math.TAU;
-    let radius = Math.random();
-
+function generateMable(apiMarble) {
     return {
-        key: key,
-        color: color,
-        angle: angle,
-        radius: radius,
-        x: Math.cos(angle) * radius * MARBLE_PILE_RADIUS,
-        y: Math.sin(angle) * radius * MARBLE_PILE_RADIUS,
+        key: apiMarble.key,
+        color: apiMarble.color,
+        angle: apiMarble.angle,
+        radius: apiMarble.radius,
+        x: Math.cos(apiMarble.angle) * apiMarble.radius * MARBLE_PILE_RADIUS,
+        y: Math.sin(apiMarble.angle) * apiMarble.radius * MARBLE_PILE_RADIUS,
     }
 }
 

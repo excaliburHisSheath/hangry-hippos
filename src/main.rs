@@ -58,7 +58,6 @@ fn main() {
         players.clone(),
         host_broadcaster.clone(),
         player_broadcaster.clone(),
-        marble_generator.clone(),
     );
 
     // Start the main Rocket application.

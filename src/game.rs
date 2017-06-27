@@ -147,7 +147,7 @@ pub struct Player {
 
 pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Marble {
     key: usize,
 
@@ -178,7 +178,7 @@ impl MarbleGenerator {
         Marble {
             key: self.0.fetch_add(1, Ordering::Relaxed),
             color: thread_rng().choose(COLORS).unwrap().to_string(),
-            angle: random() * 2.0 * ::std::f64::consts::PI,
+            angle: random::<f64>() * 2.0 * ::std::f64::consts::PI,
             radius: random(),
         }
     }
@@ -205,31 +205,34 @@ pub fn start_game_loop(
                     // Ignore hippos that are not ready to eat.
                     if now < player.next_eat_time { return true; }
 
-
-                    // Try to eat a ball. If there's one for the hippo to eat, we get a point.
+                    // Try to eat a marble. If there's one for the hippo to eat, we get a point.
                     // Otherwise, the hippo is le dead.
-                    if player.balls > 0 {
-                        // Eat a ball, get a point.
-                        player.balls -= 1;
+                    if player.marbles.len() > 0 {
+                        // Eat a marble, get a point.
+                        let removed = player.marbles.remove(0);
                         player.score += 1;
+
+                        // Remove the marble from the player's food pile.
 
                         // Broadcast the new score to all hosts.
                         host_broadcaster.send(HostBroadcast::HippoEat {
                             id,
                             score: player.score,
-                            balls: player.balls,
+                            marble_key: removed.key,
+                            num_marbles: player.marbles.len(),
                         });
 
                         // Broadcast the new score to all players.
                         player_broadcaster.send(PlayerBroadcast::HippoEat {
                             id,
                             score: player.score,
-                            balls: player.balls,
+                            num_marbles: player.marbles.len(),
                         });
 
                         // Determine the next time the player's hippo will eat.
                         player.next_eat_time += Duration::from_millis(750);
 
+                        // Keep the player in the players map.
                         true
                     } else {
                         // Notify the hosts and players that the player lost.
@@ -238,8 +241,6 @@ pub fn start_game_loop(
                             id,
                             score: player.score,
                         });
-
-                        // TODO: Notify the player that they lost.
 
                         // Remove the player from the players map.
                         false
