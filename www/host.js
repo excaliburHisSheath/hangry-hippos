@@ -8,6 +8,8 @@ const RIGHT_SIDE = 1;
 const BOTTOM_SIDE = 2;
 const LEFT_SIDE = 3;
 
+const SIDE_CSS_NAME = ['top', 'right', 'bottom', 'left'];
+
 // Initialize the VueJS app. This is used for app rendering.
 let app = new Vue({
     el: '#vue-root',
@@ -122,47 +124,18 @@ socket.onmessage = (event) => {
         assert(hippo.marbles.length === info.num_marbles, 'Hippo marbles out of sync with server');
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
-        // depends on the side of the screen that the hippo is on.
+        // depends on the side of the screen that the hippo is on, so we dynamically set the
+        // animation property that moves the hippo relative to its side of the screen.
         let element = document.getElementById(hippo.player.id);
-        switch (hippo.side.side) {
-            case TOP_SIDE: {
-                TweenMax.fromTo(
-                    element,
-                    .2,
-                    { top: 0 },
-                    { top: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
-                );
-            } break;
+        let sideName = SIDE_CSS_NAME[hippo.side.side];
 
-            case RIGHT_SIDE: {
-                TweenMax.fromTo(
-                    element,
-                    .2,
-                    { right: 0 },
-                    { right: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
-                );
-            } break;
+        let from = {};
+        from[sideName] = 0;
 
-            case BOTTOM_SIDE: {
-                TweenMax.fromTo(
-                    element,
-                    .2,
-                    { bottom: 0 },
-                    { bottom: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
-                );
-            } break;
+        let to = { repeat: 1, yoyo: true, overwrite: 'none' };
+        to[sideName] = '100px';
 
-            case LEFT_SIDE: {
-                TweenMax.fromTo(
-                    element,
-                    .2,
-                    { left: 0 },
-                    { left: '100px', repeat: 1, yoyo: true, overwrite: 'none' },
-                );
-            } break;
-
-            default: throw new Error('Unrecognized hippo side: ' + hippo.side.side);
-        }
+        TweenMax.fromTo(element, .2, from, to);
     } else if (payload['PlayerLose']) {
         let info = payload['PlayerLose'];
 
