@@ -171,6 +171,7 @@ pub fn generate_username() -> String {
         "His Potamus",
         "Mr. Lebowski",
         "Egopotamus",
+        "Markihippo",
         "Mr. Hippo was my father's name",
         "Stardew Hippo",
         "Ninja Hippo",
