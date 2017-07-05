@@ -20,7 +20,7 @@ pub enum HostBroadcast {
         id: PlayerId,
 
         // The player's display name.
-        username: String,
+        name: String,
 
         /// The starting score for the player.
         score: usize,

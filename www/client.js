@@ -19,9 +19,9 @@ let app = new Vue({
                 return;
             }
 
-            let payload = {
-                player: this.id,
-            };
+            post('/api/feed-me', { id: this.id }, response => {
+                this.score = response.score;
+            });
 
             // Animate the text in the center of the screen to give the user some feedback when
             // they tap.
@@ -37,10 +37,6 @@ let app = new Vue({
                 { rotation: 0 },
                 { rotation: Math.random() * 6 - 3, yoyo: true, repeat: 1 },
             );
-
-            post('api/feed-me', payload, response => {
-                this.numMarbles = response.num_marbles;
-            });
         },
 
         reload: function () {
@@ -83,9 +79,8 @@ socket.onclose = function(event) {
 };
 
 // Register the player with the backend.
-get('api/register-player', response => {
+get('/api/register-player', response => {
     app.id = response.id;
-    app.username = response.username;
+    app.hippoName = response.name;
     app.score = 0;
-    app.numMarbles = response.num_marbles;
 });

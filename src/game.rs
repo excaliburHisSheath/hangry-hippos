@@ -210,7 +210,7 @@ pub struct Player {
     pub id: PlayerId,
 
     /// The player's display name
-    pub username: String,
+    pub name: String,
 
     /// The player's current score.
     pub score: usize,

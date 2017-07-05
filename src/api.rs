@@ -11,7 +11,11 @@ use rocket_contrib::JSON;
 pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
-    pub username: String,
+
+    /// The display name for the player.
+    pub name: String,
+
+    /// The player's starting score.
     pub score: usize,
 }
 
@@ -25,11 +29,11 @@ pub fn register_player(
 ) -> JSON<RegisterPlayerResponse>
 {
     let id = player_id_generator.next_id();
-    let username = game::generate_username();
+    let name = game::generate_username();
 
     let player = Player {
         id,
-        username: username.clone(),
+        name: name.clone(),
         score: 0,
     };
 
@@ -43,14 +47,14 @@ pub fn register_player(
     // Broadcast to all hosts that a new player has joined.
     broadcaster.send(HostBroadcast::PlayerRegister {
         id,
-        username: username.clone(),
+        name: name.clone(),
         score: 0,
     });
 
     // Respond to the client.
     JSON(RegisterPlayerResponse {
         id,
-        username,
+        name,
         score: 0,
     })
 }
@@ -123,7 +127,7 @@ pub struct PlayerData {
     id: PlayerId,
 
     /// The player's display name.
-    username: String,
+    name: String,
 
     /// The player's current score.
     score: usize,
@@ -140,7 +144,7 @@ pub fn get_players(players: State<PlayerMap>) -> JSON<PlayersResponse> {
         .map(|player| {
             PlayerData {
                 id: player.id,
-                username: player.username.clone(),
+                name: player.name.clone(),
                 score: player.score,
             }
         })
