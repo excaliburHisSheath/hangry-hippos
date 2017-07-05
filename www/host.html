@@ -59,6 +59,7 @@
                 <hippo-head
                     v-for="hippo in bottomHippos"
                     :key="hippo.player.id"
+                    v-bind:hippo="hippo"
                 ></hippo-head>
             </div>
 

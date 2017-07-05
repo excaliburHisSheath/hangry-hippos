@@ -109,20 +109,6 @@ body {
     height: 100px;
 }
 
-.marble {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-
-    background-color: blue;
-}
-
 /* Top side styles. */
 #top-side .hippo-text {
     top: 200px;

@@ -34,20 +34,8 @@ Vue.component('hippo-head', {
         <div class="hippo-text">
             <div class="hippo-name">{{ hippo.player.name }}</div>
             <div class="hippo-score">Score: {{ hippo.player.score }}</div>
-            <div class="hippo=marbles">Marbles: {{ hippo.marbles.length }}</div>
         </div>
-        <div class="food-pile">
-            <transition-group v-on:enter="enter" v-bind:css="false">
-                <div
-                    class="marble"
-                    v-for="marble in hippo.marbles"
-                    :key="marble.key"
-                    v-bind:style="{ backgroundColor: marble.color, transform: 'translate(' + marble.x + 'px, ' + marble.y + 'px)' }"
-                    v-bind:x="marble.x"
-                    v-bind:y="marble.y"
-                ></div>
-            </transition-group>
-        </div>
+        <img src="assets/marbles.jpg" class="food-pile">
         <img src="assets/hippo.jpg" class="hippo-head-image" :id="hippo.player.id">
     </div>
     `,
@@ -97,16 +85,7 @@ socket.onmessage = (event) => {
     let payload = JSON.parse(event.data);
 
     if (payload['PlayerRegister']) {
-        registerPlayer(payload['PlayerRegister']);
-    } else if (payload['AddMarble']) {
-        let info = payload['AddMarble'];
-
-        // Find the hippo/player for the player that scored.
-        let hippo = app.hippoMap[info.id];
-        assert(hippo != null, 'Unable to find hippo for ID: ' + info.id);
-
-        hippo.marbles.push(generateMable(info.marble));
-        assert(hippo.marbles.length === info.num_marbles, 'Hippo marbles out of sync with server');
+        addPlayer(payload['PlayerRegister']);
     } else if (payload['HippoEat']) {
         let info = payload['HippoEat'];
 
@@ -116,12 +95,6 @@ socket.onmessage = (event) => {
 
         // Updated the local score for the player.
         hippo.player.score = info.score;
-
-        // Remove the eaten marble.
-        let index = hippo.marbles.findIndex(marble => marble.key === info.marble_key);
-        assert(index >= 0, 'Eaten marble was not in food pile');
-        hippo.marbles.splice(index, 1);
-        assert(hippo.marbles.length === info.num_marbles, 'Hippo marbles out of sync with server');
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on, so we dynamically set the
@@ -161,28 +134,22 @@ get('/api/players', response => {
 
     // Add players to the player map, so we can find them by ID.
     for (let player of players) {
-        registerPlayer(player);
+        addPlayer(player);
     }
 });
 
 /**
  * Creates a hippo for the new player and adds it to one side of the screen.
  */
-function registerPlayer(player) {
+function addPlayer(player) {
     // Get the side that we're going to add the hippo to.
     let side = SIDES[currentSide];
     currentSide = (currentSide + 1) % SIDES.length;
-
-    let marbles = [];
-    for (let marble of player.marbles) {
-        marbles.push(generateMable(marble));
-    }
 
     // Create a hippo object for the player.
     let hippo = {
         player: player,
         side: side,
-        marbles: marbles,
     };
 
     // Add the hippo to the hippo map and its side of the screen.
@@ -191,19 +158,7 @@ function registerPlayer(player) {
     side.array.push(hippo);
 }
 
-const MARBLE_PILE_RADIUS = 40;
-function generateMable(apiMarble) {
-    return {
-        key: apiMarble.key,
-        color: apiMarble.color,
-        angle: apiMarble.angle,
-        radius: apiMarble.radius,
-        x: Math.cos(apiMarble.angle) * apiMarble.radius * MARBLE_PILE_RADIUS,
-        y: Math.sin(apiMarble.angle) * apiMarble.radius * MARBLE_PILE_RADIUS,
-    }
-}
-
-// Start the attract an
+// Start the attract animation.
 let element = document.getElementById('attract-message');
 const ATTRACT_ANIM_DURATION = 0.75;
 TweenMax.to(element, ATTRACT_ANIM_DURATION, { scale: 1.3, repeat: -1, yoyo: true });
