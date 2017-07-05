@@ -6,9 +6,8 @@ let app = new Vue({
 
     data: {
         id: null,
-        username: null,
+        hippoName: null,
         score: null,
-        numMarbles: null,
         isPlaying: true,
     },
 
