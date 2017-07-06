@@ -226,9 +226,76 @@ pub fn start_game_loop(
     host_broadcaster: HostBroadcaster,
     player_broadcaster: PlayerBroadcaster,
 ) {
+
     thread::spawn(move || {
+        // NOTE: These should be `const`, but you can't make a const `Duration`.
+        let nose_goes_duration = Duration::from_millis(10_000);
+        let nose_goes_interval = Duration::from_millis(60_000);
+
+        let mut nose_goes = NoseGoes::Inactive {
+            next_start_time: Instant::now() + nose_goes_interval,
+        };
+
         loop {
+            let now = Instant::now();
+
+            nose_goes = match nose_goes {
+                NoseGoes::Inactive { next_start_time } => {
+                    if next_start_time > now {
+                        let remaining_players = players
+                            .read()
+                            .expect("Player map was poisoned!")
+                            .keys()
+                            .cloned()
+                            .collect();
+
+                        NoseGoes::InProgress {
+                            start_time: next_start_time,
+                            end_time: next_start_time + nose_goes_duration,
+                            remaining_players,
+                        }
+                    } else {
+                        NoseGoes::Inactive { next_start_time }
+                    }
+                }
+
+                NoseGoes::InProgress { start_time, end_time, remaining_players } => {
+                    if now > end_time {
+                        // Pick a random player to be the loser.
+                        let loser = thread_rng().choose(&*remaining_players).unwrap();
+
+                        // Remove the player from the player map.
+                        let mut players = players.write().expect("Player map was poisoned");
+                        let loser_info = players.remove(loser).expect("Loser wasn't in player map");
+
+                        // Broadcast player loss to players and hosts.
+                        host_broadcaster.send(HostBroadcast::PlayerLose { id: *loser });
+                        player_broadcaster.send(PlayerBroadcast::PlayerLose {
+                            id: *loser,
+                            score: loser_info.score,
+                        });
+
+                        NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
+                    } else {
+                        NoseGoes::InProgress { start_time, end_time, remaining_players }
+                    }
+                }
+            };
+
             thread::sleep(Duration::from_millis(100));
         }
     });
+}
+
+/// State information for nose-goes events.
+enum NoseGoes {
+    Inactive {
+        next_start_time: Instant,
+    },
+
+    InProgress {
+        start_time: Instant,
+        end_time: Instant,
+        remaining_players: Vec<PlayerId>,
+    }
 }
