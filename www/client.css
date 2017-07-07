@@ -82,3 +82,25 @@ button {
 .hippo-name {
     color: #bc00a6;
 }
+
+#nose-goes-overlay {
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+#poison-marble {
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+
+    position: absolute;
+
+    background-color: red;
+}

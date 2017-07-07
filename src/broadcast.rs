@@ -6,6 +6,7 @@
 use game::*;
 use std::sync::*;
 use std::thread;
+use std::time::*;
 use ws;
 
 pub type HostBroadcaster = Arc<Broadcaster<HostBroadcast>>;
@@ -35,15 +36,33 @@ pub enum HostBroadcast {
         score: usize,
     },
 
-    /// A player has lost the game and should be removed from the display.
-    PlayerLose {
-        id: PlayerId,
-    }
+    /// A nose-goes event has begun, and the host should display the event.
+    BeginNoseGoes {
+        /// The duration that the nose-goes event will last.
+        duration: Duration,
+
+        /// The players that are participating in the event.
+        players: Vec<PlayerId>,
+    },
+
+    /// A nose-goes event has ended, and a player has been knocked out.
+    EndNoseGoes {
+        /// The player that got knocked out at the end of the event.
+        loser: PlayerId,
+    },
 }
 
 /// A message to be broadcast to connected player clients.
 #[derive(Debug, Serialize)]
 pub enum PlayerBroadcast {
+    /// A nose-goes event has begun, and the player should be prompted to participate.
+    BeginNoseGoes,
+
+    /// A nose-goes event has finished, and a player has been knocked out.
+    EndNoseGoes {
+        loser: PlayerId,
+    },
+
     /// A player has lost the game and has been removed.
     PlayerLose {
         /// The ID for the player that thi event applies to.

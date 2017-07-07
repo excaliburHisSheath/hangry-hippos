@@ -9,6 +9,11 @@ let app = new Vue({
         hippoName: null,
         score: null,
         isPlaying: true,
+        noseGoes: {
+            isActive: false,
+            marbleX: 0,
+            marbleY: 0,
+        },
     },
 
     methods: {
@@ -49,10 +54,23 @@ let app = new Vue({
 // actually a good idea, but whatevs.
 let socket = new WebSocket('ws://' + window.location.hostname + ':6768');
 socket.onmessage = function(event) {
+    // Ignore websocket events if the game is over.
+    if (!app.isPlaying) {
+        return;
+    }
+
     // TODO: Do some kind of validation.
     let payload = JSON.parse(event.data);
+    console.log(payload);
 
-    if (payload['HippoEat']) {
+    if (payload === 'BeginNoseGoes') {
+        app.noseGoes.isActive = true;
+        app.noseGoes.marbleX = Math.random();
+        app.noseGoes.marbleY = Math.random();
+    } else if (payload['EndNoseGoes']) {
+        // TODO: Do some kind of animation when the player is the one who lost?
+        app.noseGoes.isActive = false;
+    } else if (payload['HippoEat']) {
         let event = payload['HippoEat'];
         if (event.id === app.id) {
             app.score = event.score;

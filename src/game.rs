@@ -230,10 +230,12 @@ pub fn start_game_loop(
     thread::spawn(move || {
         // NOTE: These should be `const`, but you can't make a const `Duration`.
         let nose_goes_duration = Duration::from_millis(10_000);
-        let nose_goes_interval = Duration::from_millis(60_000);
+        let nose_goes_interval = Duration::from_millis(10_000);
+
+        let start_time = Instant::now();
 
         let mut nose_goes = NoseGoes::Inactive {
-            next_start_time: Instant::now() + nose_goes_interval,
+            next_start_time: start_time + nose_goes_interval,
         };
 
         loop {
@@ -245,7 +247,13 @@ pub fn start_game_loop(
                     if now > next_start_time {
                         if players.len() > 1 {
                             // Add all players to the nose-goes event.
-                            let remaining_players = players.keys().cloned().collect();
+                            let remaining_players: Vec<PlayerId> = players.keys().cloned().collect();
+
+                            host_broadcaster.send(HostBroadcast::BeginNoseGoes {
+                                duration: nose_goes_duration,
+                                players: remaining_players.clone(),
+                            });
+                            player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
 
                             NoseGoes::InProgress {
                                 start_time: next_start_time,
@@ -266,16 +274,17 @@ pub fn start_game_loop(
                 NoseGoes::InProgress { start_time, end_time, remaining_players } => {
                     if now > end_time {
                         // Pick a random player to be the loser.
-                        let loser = thread_rng().choose(&*remaining_players).unwrap();
+                        let loser = *thread_rng().choose(&*remaining_players).unwrap();
 
                         // Remove the player from the player map.
                         let mut players = players.write().expect("Player map was poisoned");
-                        let loser_info = players.remove(loser).expect("Loser wasn't in player map");
+                        let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
 
                         // Broadcast player loss to players and hosts.
-                        host_broadcaster.send(HostBroadcast::PlayerLose { id: *loser });
+                        host_broadcaster.send(HostBroadcast::EndNoseGoes { loser });
+                        player_broadcaster.send(PlayerBroadcast::EndNoseGoes { loser });
                         player_broadcaster.send(PlayerBroadcast::PlayerLose {
-                            id: *loser,
+                            id: loser,
                             score: loser_info.score,
                         });
 
