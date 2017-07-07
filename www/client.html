@@ -52,7 +52,7 @@
 
             <div id="lose-screen" class="screen" v-if="!isPlaying">
                 <h2 id="game-over-text">Game Over</h2>
-                <div id="game-over-message">Your hippo <span class="hippo-name">{{ username }}</span> ran out of colorful marbles to eat.</div>
+                <div id="game-over-message">Your hippo <span class="hippo-name">{{ hippoName }}</span> ate a poison marble and died.</div>
                 <div id="final-score-text">Your final score is {{ score }}.</div>
                 <button v-on:click.stop="reload">Play Again</button>
             </div>

@@ -241,18 +241,22 @@ pub fn start_game_loop(
 
             nose_goes = match nose_goes {
                 NoseGoes::Inactive { next_start_time } => {
-                    if next_start_time > now {
-                        let remaining_players = players
-                            .read()
-                            .expect("Player map was poisoned!")
-                            .keys()
-                            .cloned()
-                            .collect();
+                    let players = players.read().expect("Player map was poisoned!");
+                    if now > next_start_time {
+                        if players.len() > 1 {
+                            // Add all players to the nose-goes event.
+                            let remaining_players = players.keys().cloned().collect();
 
-                        NoseGoes::InProgress {
-                            start_time: next_start_time,
-                            end_time: next_start_time + nose_goes_duration,
-                            remaining_players,
+                            NoseGoes::InProgress {
+                                start_time: next_start_time,
+                                end_time: next_start_time + nose_goes_duration,
+                                remaining_players,
+                            }
+                        } else {
+                            // There aren't enough players to run the nose-goes event. Delay until
+                            // later.
+                            let next_start_time = next_start_time + nose_goes_interval;
+                            NoseGoes::Inactive { next_start_time }
                         }
                     } else {
                         NoseGoes::Inactive { next_start_time }
@@ -288,6 +292,7 @@ pub fn start_game_loop(
 }
 
 /// State information for nose-goes events.
+#[derive(Debug)]
 enum NoseGoes {
     Inactive {
         next_start_time: Instant,
