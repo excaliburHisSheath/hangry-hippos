@@ -1,7 +1,10 @@
 use broadcast::*;
 use rand::*;
+use rocket::request::FromParam;
 use serde::*;
 use std::collections::{ HashMap, HashSet };
+use std::mem;
+use std::str::FromStr;
 use std::sync::*;
 use std::sync::atomic::*;
 use std::thread;
@@ -35,6 +38,15 @@ impl Deserialize for PlayerId {
         let string_id = String::deserialize(deserializer)?;
         let id_inner = string_id.parse().map_err(de::Error::custom)?;
         Ok(PlayerId(id_inner))
+    }
+}
+
+impl<'a> FromParam<'a> for PlayerId {
+    type Error = <usize as FromStr>::Err;
+
+    fn from_param(param: &'a str) -> Result<PlayerId, Self::Error> {
+        let inner = param.parse()?;
+        Ok(PlayerId(inner))
     }
 }
 
@@ -227,29 +239,31 @@ pub fn start_game_loop(
     host_broadcaster: HostBroadcaster,
     player_broadcaster: PlayerBroadcaster,
 ) {
-
     thread::spawn(move || {
         // NOTE: These should be `const`, but you can't make a const `Duration`.
         let nose_goes_duration = Duration::from_millis(10_000);
         let nose_goes_interval = Duration::from_millis(10_000);
 
-        let start_time = Instant::now();
-
         loop {
             let now = Instant::now();
 
             let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
-            *nose_goes = match *nose_goes {
+
+            // Match the current nose-goes state, and return the new state.
+            //
+            // NOTE: We use `mem::replace` to move the current state out of the `Mutex`, so that we
+            // can safely destructure and mutate it.
+            *nose_goes = match mem::replace(&mut *nose_goes, NoseGoes::default()) {
                 NoseGoes::Inactive { next_start_time } => {
                     let players = players.read().expect("Player map was poisoned!");
                     if now > next_start_time {
                         if players.len() > 1 {
                             // Add all players to the nose-goes event.
-                            let remaining_players: Vec<PlayerId> = players.keys().cloned().collect();
+                            let remaining_players: HashSet<PlayerId> = players.keys().cloned().collect();
 
                             host_broadcaster.send(HostBroadcast::BeginNoseGoes {
                                 duration: nose_goes_duration,
-                                players: remaining_players.clone(),
+                                players: remaining_players.iter().cloned().collect(),
                             });
                             player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
 
@@ -272,7 +286,11 @@ pub fn start_game_loop(
                 NoseGoes::InProgress { start_time, end_time, remaining_players } => {
                     if now > end_time {
                         // Pick a random player to be the loser.
-                        let loser = *thread_rng().choose(&remaining_players).unwrap();
+                        let loser = remaining_players
+                            .iter()
+                            .nth(thread_rng().gen_range(0, remaining_players.len()))
+                            .cloned()
+                            .unwrap();
 
                         // Remove the player from the player map.
                         let mut players = players.write().expect("Player map was poisoned");

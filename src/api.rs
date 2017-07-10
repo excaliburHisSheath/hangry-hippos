@@ -117,8 +117,6 @@ pub enum NoseGoesResponse {
 pub fn nose_goes(
     id: PlayerId,
     nose_goes: State<NoseGoesState>,
-    player_broadcaster: State<PlayerBroadcaster>,
-    host_broadcaster: State<HostBroadcaster>,
 ) -> Result<JSON<NoseGoesResponse>> {
     let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
     match *nose_goes {
@@ -126,7 +124,7 @@ pub fn nose_goes(
             Err(Error::InvalidNoesGoes)
         }
 
-        NoseGoes::InProgress { remaining_players, .. } => {
+        NoseGoes::InProgress { ref mut remaining_players, .. } => {
             // It's an error for the player to not be part of the nose-goes event.
             if !remaining_players.contains(&id) {
                 return Err(Error::InvalidNoesGoes);

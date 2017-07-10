@@ -73,6 +73,7 @@ fn main() {
             api::register_player,
             api::feed_player,
             api::get_players,
+            api::nose_goes,
         ])
         .manage(PlayerIdGenerator::default())
         .manage(players)

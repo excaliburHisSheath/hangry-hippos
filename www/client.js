@@ -50,12 +50,12 @@ let app = new Vue({
 
         poisonMarble: function () {
             post(`/api/nose-goes/${this.id}`, {}, response => {
-                if (response.result === 'Survived') {
+                if (response === 'Survived') {
                     // TODO: What do we do if the player survived?
-                } else if (response.result === 'Died') {
+                } else if (response === 'Died') {
                     // TODO: Do we handle the player's death now or what?
                 } else {
-                    console.error('Unrecognized nose-goes result:', response.result);
+                    console.error('Unrecognized nose-goes result:', response);
                 }
             });
 
