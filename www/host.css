@@ -171,3 +171,14 @@ body {
     font-size: 130%;
     color: #bc00a6;
 }
+
+#nose-goes {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+
+    font-size: 300%;
+    color: red;
+}

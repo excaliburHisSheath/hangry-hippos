@@ -23,6 +23,10 @@ let app = new Vue({
         // Keep a map to allow us ot lookup hippos by player ID. The hippos keep a reference to
         // their player so this also allows us to lookup players by ID.
         hippoMap: {},
+
+        noseGoes: {
+            isActive: false,
+        },
     },
 });
 
@@ -109,16 +113,13 @@ socket.onmessage = (event) => {
         to[sideName] = '100px';
 
         TweenMax.fromTo(element, .2, from, to);
-    } else if (payload['PlayerLose']) {
-        let info = payload['PlayerLose'];
-
-        // Retreive the hippo and remove it from the hippo map.
-        let hippo = app.hippoMap[info.id];
-        assert(delete app.hippoMap[info.id], 'Unable to remove player for id ' + info.id);
-
-        // Remove the hippo from its side of the screen.
-        let index = hippo.side.array.indexOf(hippo);
-        hippo.side.array.splice(index, 1);
+    } else if (payload['BeginNoseGoes']) {
+        let info = payload['BeginNoseGoes'];
+        app.noseGoes.isActive = true;
+    } else if (payload['EndNoseGoes']) {
+        let info = payload['EndNoseGoes'];
+        app.noseGoes.isActive = false;
+        removePlayer(info.loser);
     } else {
         console.error('Unrecognized host event:', payload);
     }
@@ -158,6 +159,18 @@ function addPlayer(player) {
     side.array.push(hippo);
 }
 
+/**
+ * Removes a player and removes their hippo from the screen.
+ */
+function removePlayer(player) {
+    let hippo = app.hippoMap[player];
+    assert(delete app.hippoMap[player], 'Unable to remove player for id ' + player);
+
+    // Remove the hippo from its side of the screen.
+    let index = hippo.side.array.indexOf(hippo);
+    hippo.side.array.splice(index, 1);
+}
+
 // Start the attract animation.
 let element = document.getElementById('attract-message');
 const ATTRACT_ANIM_DURATION = 0.75;
@@ -167,4 +180,14 @@ TweenMax.fromTo(
     ATTRACT_ANIM_DURATION * 2,
     { rotation: -3 },
     { rotation: 3, ease: Sine.easeInOut, repeat: -1, yoyo: true, delay: ATTRACT_ANIM_DURATION },
+);
+
+// Start the nose-goes fidget animation.
+let noseGoesElement = document.getElementById('nose-goes');
+TweenMax.to(noseGoesElement, 0.13, { scale: 1.1, repeat: -1, yoyo: true });
+TweenMax.fromTo(
+    noseGoesElement,
+    0.1,
+    { rotation: -2 },
+    { rotation: 2, repeat: -1, yoyo: true },
 );

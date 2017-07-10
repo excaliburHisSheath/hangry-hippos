@@ -70,10 +70,14 @@
                     v-bind:hippo="hippo"
                 ></hippo-head>
             </div>
-        </div>
 
-        <div id="attract-message">
-            Go to <span id="site-address">http://hungryhipp.us/</span> to play!
+            <div id="attract-message" v-show="!noseGoes.isActive">
+                Go to <span id="site-address">http://hungryhipp.us/</span> to play!
+            </div>
+
+            <div id="nose-goes" v-show="noseGoes.isActive">
+                Look at your phone!
+            </div>
         </div>
 
         <!-- Load script for the host. -->

@@ -54,6 +54,7 @@ let app = new Vue({
                     // TODO: What do we do if the player survived?
                 } else if (response === 'Died') {
                     // TODO: Do we handle the player's death now or what?
+                    app.isPlaying = false;
                 } else {
                     console.error('Unrecognized nose-goes result:', response);
                 }
@@ -75,7 +76,6 @@ socket.onmessage = function(event) {
 
     // TODO: Do some kind of validation.
     let payload = JSON.parse(event.data);
-    console.log(payload);
 
     if (payload === 'BeginNoseGoes') {
         app.noseGoes.isActive = true;

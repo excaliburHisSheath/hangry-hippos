@@ -242,7 +242,7 @@ pub fn start_game_loop(
     thread::spawn(move || {
         // NOTE: These should be `const`, but you can't make a const `Duration`.
         let nose_goes_duration = Duration::from_millis(10_000);
-        let nose_goes_interval = Duration::from_millis(10_000);
+        let nose_goes_interval = Duration::from_millis(30_000);
 
         loop {
             let now = Instant::now();
