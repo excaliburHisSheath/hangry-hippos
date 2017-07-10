@@ -58,7 +58,11 @@
             </div>
 
             <div id="nose-goes-overlay" v-if="noseGoes.isActive">
-                <div id="poison-marble" v-bind:style="{ top: (noseGoes.marbleY * 100) + '%', left: (noseGoes.marbleX * 100) + '%' }"></div>
+                <div
+                    id="poison-marble"
+                    v-bind:style="{ top: (noseGoes.marbleY * 100) + '%', left: (noseGoes.marbleX * 100) + '%' }"
+                    v-on:click="poisonMarble"
+                ></div>
             </div>
         </div>
 

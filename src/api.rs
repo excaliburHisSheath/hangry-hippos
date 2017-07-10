@@ -83,8 +83,7 @@ pub fn feed_player(
     payload: JSON<FeedMeRequest>,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
-) -> Result<JSON<FeedMeResponse>>
-{
+) -> Result<JSON<FeedMeResponse>> {
     let payload = payload.into_inner();
     let id = payload.id;
 
@@ -106,6 +105,43 @@ pub fn feed_player(
     // Update the host displays and respond to the player.
     broadcaster.send(HostBroadcast::HippoEat { id, score });
     Ok(JSON(FeedMeResponse { score }))
+}
+
+#[derive(Debug, Serialize)]
+pub enum NoseGoesResponse {
+    Survived,
+    Died,
+}
+
+#[post("/nose-goes/<id>")]
+pub fn nose_goes(
+    id: PlayerId,
+    nose_goes: State<NoseGoesState>,
+    player_broadcaster: State<PlayerBroadcaster>,
+    host_broadcaster: State<HostBroadcaster>,
+) -> Result<JSON<NoseGoesResponse>> {
+    let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
+    match *nose_goes {
+        NoseGoes::Inactive { .. } => {
+            Err(Error::InvalidNoesGoes)
+        }
+
+        NoseGoes::InProgress { remaining_players, .. } => {
+            // It's an error for the player to not be part of the nose-goes event.
+            if !remaining_players.contains(&id) {
+                return Err(Error::InvalidNoesGoes);
+            }
+
+            // If there are multiple players still in the event, remove the player. If the player
+            // is the last one left, they die.
+            if remaining_players.len() > 1 {
+                remaining_players.remove(&id);
+                Ok(JSON(NoseGoesResponse::Survived))
+            } else {
+                Ok(JSON(NoseGoesResponse::Died))
+            }
+        }
+    }
 }
 
 /// The response sent back from the `/scoreboard` endpoint.
@@ -162,6 +198,14 @@ pub enum Error {
     /// now trying to use the ID in a session where it is no longer valid. Re-registering the
     /// player to generate a new ID should fix the issue.
     InvalidPlayer(PlayerId),
+
+    /// Indicates that a noes-goes request was not valid.
+    ///
+    /// This can occur for two reasons:
+    ///
+    /// - The request arrived when no noes-goes event was active.
+    /// - The player was not a part of the active noes-goes event.
+    InvalidNoesGoes,
 }
 
 impl<'r> Responder<'r> for Error {

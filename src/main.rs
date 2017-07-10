@@ -54,8 +54,10 @@ fn main() {
     let host_broadcaster = broadcast::start_server::<HostBroadcast>("0.0.0.0:6769");
 
     let players = PlayerMap::default();
+    let nose_goes = NoseGoesState::default();
     game::start_game_loop(
         players.clone(),
+        nose_goes.clone(),
         host_broadcaster.clone(),
         player_broadcaster.clone(),
     );
@@ -74,6 +76,7 @@ fn main() {
         ])
         .manage(PlayerIdGenerator::default())
         .manage(players)
+        .manage(nose_goes)
         .manage(host_broadcaster)
         .manage(player_broadcaster)
         .launch();

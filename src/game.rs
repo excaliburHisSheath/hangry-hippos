@@ -1,7 +1,7 @@
 use broadcast::*;
 use rand::*;
 use serde::*;
-use std::collections::HashMap;
+use std::collections::{ HashMap, HashSet };
 use std::sync::*;
 use std::sync::atomic::*;
 use std::thread;
@@ -223,6 +223,7 @@ pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
 /// Spawns a thread that updates game state and broadcasts updates to the players and hosts.
 pub fn start_game_loop(
     players: PlayerMap,
+    nose_goes: NoseGoesState,
     host_broadcaster: HostBroadcaster,
     player_broadcaster: PlayerBroadcaster,
 ) {
@@ -234,14 +235,11 @@ pub fn start_game_loop(
 
         let start_time = Instant::now();
 
-        let mut nose_goes = NoseGoes::Inactive {
-            next_start_time: start_time + nose_goes_interval,
-        };
-
         loop {
             let now = Instant::now();
 
-            nose_goes = match nose_goes {
+            let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
+            *nose_goes = match *nose_goes {
                 NoseGoes::Inactive { next_start_time } => {
                     let players = players.read().expect("Player map was poisoned!");
                     if now > next_start_time {
@@ -274,7 +272,7 @@ pub fn start_game_loop(
                 NoseGoes::InProgress { start_time, end_time, remaining_players } => {
                     if now > end_time {
                         // Pick a random player to be the loser.
-                        let loser = *thread_rng().choose(&*remaining_players).unwrap();
+                        let loser = *thread_rng().choose(&remaining_players).unwrap();
 
                         // Remove the player from the player map.
                         let mut players = players.write().expect("Player map was poisoned");
@@ -302,7 +300,7 @@ pub fn start_game_loop(
 
 /// State information for nose-goes events.
 #[derive(Debug)]
-enum NoseGoes {
+pub enum NoseGoes {
     Inactive {
         next_start_time: Instant,
     },
@@ -310,6 +308,16 @@ enum NoseGoes {
     InProgress {
         start_time: Instant,
         end_time: Instant,
-        remaining_players: Vec<PlayerId>,
+        remaining_players: HashSet<PlayerId>,
     }
 }
+
+impl Default for NoseGoes {
+    fn default() -> NoseGoes {
+        NoseGoes::Inactive {
+            next_start_time: Instant::now() + Duration::from_millis(10_000),
+        }
+    }
+}
+
+pub type NoseGoesState = Arc<Mutex<NoseGoes>>;

@@ -20,7 +20,7 @@ let app = new Vue({
         feedMe: function () {
             // If the user taps after they've lost, don't do anything.
             // TODO: Can we have Vue remove the binding when `isPlaying` is false?
-            if (!this.isPlaying) {
+            if (!this.isPlaying || this.noseGoes.isActive) {
                 return;
             }
 
@@ -46,6 +46,20 @@ let app = new Vue({
 
         reload: function () {
             window.location.reload(false);
+        },
+
+        poisonMarble: function () {
+            post(`/api/nose-goes/${this.id}`, {}, response => {
+                if (response.result === 'Survived') {
+                    // TODO: What do we do if the player survived?
+                } else if (response.result === 'Died') {
+                    // TODO: Do we handle the player's death now or what?
+                } else {
+                    console.error('Unrecognized nose-goes result:', response.result);
+                }
+            });
+
+            this.noseGoes.isActive = false;
         }
     },
 });
@@ -54,8 +68,8 @@ let app = new Vue({
 // actually a good idea, but whatevs.
 let socket = new WebSocket('ws://' + window.location.hostname + ':6768');
 socket.onmessage = function(event) {
-    // Ignore websocket events if the game is over.
-    if (!app.isPlaying) {
+    // Ignore websocket events if the game is over or there's a nose-goes event.
+    if (!app.isPlaying && !app.noseGoes.isActive) {
         return;
     }
 
