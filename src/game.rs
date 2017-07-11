@@ -245,9 +245,10 @@ pub fn start_game_loop(
         let nose_goes_interval = Duration::from_millis(30_000);
 
         loop {
-            let now = Instant::now();
-
+            // NOTE: Perform all logic for the loop body in this inner block. Doing so will ensure
+            // that any acquired locks will be released before the thread sleeps.
             {
+                let now = Instant::now();
                 let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
 
                 // Match the current nose-goes state, and return the new state.
