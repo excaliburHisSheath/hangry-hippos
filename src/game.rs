@@ -247,69 +247,71 @@ pub fn start_game_loop(
         loop {
             let now = Instant::now();
 
-            let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
+            {
+                let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
 
-            // Match the current nose-goes state, and return the new state.
-            //
-            // NOTE: We use `mem::replace` to move the current state out of the `Mutex`, so that we
-            // can safely destructure and mutate it.
-            *nose_goes = match mem::replace(&mut *nose_goes, NoseGoes::default()) {
-                NoseGoes::Inactive { next_start_time } => {
-                    let players = players.read().expect("Player map was poisoned!");
-                    if now > next_start_time {
-                        if players.len() > 1 {
-                            // Add all players to the nose-goes event.
-                            let remaining_players: HashSet<PlayerId> = players.keys().cloned().collect();
+                // Match the current nose-goes state, and return the new state.
+                //
+                // NOTE: We use `mem::replace` to move the current state out of the `Mutex`, so that we
+                // can safely destructure and mutate it.
+                *nose_goes = match mem::replace(&mut *nose_goes, NoseGoes::default()) {
+                    NoseGoes::Inactive { next_start_time } => {
+                        let players = players.read().expect("Player map was poisoned!");
+                        if now > next_start_time {
+                            if players.len() > 1 {
+                                // Add all players to the nose-goes event.
+                                let remaining_players: HashSet<PlayerId> = players.keys().cloned().collect();
 
-                            host_broadcaster.send(HostBroadcast::BeginNoseGoes {
-                                duration: nose_goes_duration,
-                                players: remaining_players.iter().cloned().collect(),
-                            });
-                            player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
+                                host_broadcaster.send(HostBroadcast::BeginNoseGoes {
+                                    duration: nose_goes_duration,
+                                    players: remaining_players.iter().cloned().collect(),
+                                });
+                                player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
 
-                            NoseGoes::InProgress {
-                                start_time: next_start_time,
-                                end_time: next_start_time + nose_goes_duration,
-                                remaining_players,
+                                NoseGoes::InProgress {
+                                    start_time: next_start_time,
+                                    end_time: next_start_time + nose_goes_duration,
+                                    remaining_players,
+                                }
+                            } else {
+                                // There aren't enough players to run the nose-goes event. Delay until
+                                // later.
+                                let next_start_time = next_start_time + nose_goes_interval;
+                                NoseGoes::Inactive { next_start_time }
                             }
                         } else {
-                            // There aren't enough players to run the nose-goes event. Delay until
-                            // later.
-                            let next_start_time = next_start_time + nose_goes_interval;
                             NoseGoes::Inactive { next_start_time }
                         }
-                    } else {
-                        NoseGoes::Inactive { next_start_time }
                     }
-                }
 
-                NoseGoes::InProgress { start_time, end_time, remaining_players } => {
-                    if now > end_time {
-                        // Pick a random player to be the loser.
-                        let loser = remaining_players
+                    NoseGoes::InProgress { start_time, end_time, remaining_players } => {
+                        if now > end_time {
+                            // Pick a random player to be the loser.
+                            let loser = remaining_players
                             .iter()
                             .nth(thread_rng().gen_range(0, remaining_players.len()))
                             .cloned()
                             .unwrap();
 
-                        // Remove the player from the player map.
-                        let mut players = players.write().expect("Player map was poisoned");
-                        let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
+                            // Remove the player from the player map.
+                            let mut players = players.write().expect("Player map was poisoned");
+                            let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
 
-                        // Broadcast player loss to players and hosts.
-                        host_broadcaster.send(HostBroadcast::EndNoseGoes { loser });
-                        player_broadcaster.send(PlayerBroadcast::EndNoseGoes { loser });
-                        player_broadcaster.send(PlayerBroadcast::PlayerLose {
-                            id: loser,
-                            score: loser_info.score,
-                        });
+                            // Broadcast player loss to players and hosts.
+                            host_broadcaster.send(HostBroadcast::EndNoseGoes { loser });
+                            player_broadcaster.send(PlayerBroadcast::EndNoseGoes { loser });
+                            player_broadcaster.send(PlayerBroadcast::PlayerLose {
+                                id: loser,
+                                score: loser_info.score,
+                            });
 
-                        NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
-                    } else {
-                        NoseGoes::InProgress { start_time, end_time, remaining_players }
+                            NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
+                        } else {
+                            NoseGoes::InProgress { start_time, end_time, remaining_players }
+                        }
                     }
-                }
-            };
+                };
+            }
 
             thread::sleep(Duration::from_millis(100));
         }
