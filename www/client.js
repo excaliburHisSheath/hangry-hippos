@@ -11,6 +11,7 @@ let app = new Vue({
         isPlaying: true,
         noseGoes: {
             isActive: false,
+            showMarble: true,
             marbleX: 0,
             marbleY: 0,
         },
@@ -49,18 +50,16 @@ let app = new Vue({
         },
 
         poisonMarble: function () {
+            this.noseGoes.showMarble = false;
             post(`/api/nose-goes/${this.id}`, {}, response => {
                 if (response === 'Survived') {
                     // TODO: What do we do if the player survived?
                 } else if (response === 'Died') {
                     // TODO: Do we handle the player's death now or what?
-                    app.isPlaying = false;
                 } else {
                     console.error('Unrecognized nose-goes result:', response);
                 }
             });
-
-            this.noseGoes.isActive = false;
         }
     },
 });
@@ -79,6 +78,7 @@ socket.onmessage = function(event) {
 
     if (payload === 'BeginNoseGoes') {
         app.noseGoes.isActive = true;
+        app.noseGoes.showMarble = true;
         app.noseGoes.marbleX = Math.random();
         app.noseGoes.marbleY = Math.random();
     } else if (payload['EndNoseGoes']) {
