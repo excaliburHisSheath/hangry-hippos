@@ -8,7 +8,7 @@ extern crate quote;
 use proc_macro::TokenStream;
 
 #[proc_macro_derive(FromData)]
-pub fn derive(input: TokenStream) -> TokenStream {
+pub fn derive_from_data(input: TokenStream) -> TokenStream {
     // Parse the string representation.
     let derive_input = syn::parse_derive_input(&input.to_string()).unwrap();
     let ident = derive_input.ident;
@@ -35,6 +35,29 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     Ok(value) => ::rocket::outcome::Outcome::Success(value),
                     Err(e) => ::rocket::outcome::Outcome::Failure((Status::BadRequest, e)),
                 }
+            }
+        }
+    };
+    gen.parse().unwrap()
+}
+
+#[proc_macro_derive(Responder)]
+pub fn derive_responder(input: TokenStream) -> TokenStream {
+    // Parse the string representation.
+    let derive_input = syn::parse_derive_input(&input.to_string()).unwrap();
+    let ident = derive_input.ident;
+
+    let gen = quote! {
+        /// Serializes the wrapped value into JSON. Returns a response with Content-Type
+        /// JSON and a fixed-size body with the serialized value. If serialization
+        /// fails, an `Err` of `Status::InternalServerError` is returned.
+        impl ::rocket::response::Responder<'static> for #ident {
+            fn respond(self) -> ::rocket::response::Result<'static> {
+                ::serde_json::to_string(&self).map(|string| {
+                    ::rocket::response::content::JSON(string).respond().unwrap()
+                }).map_err(|_error| {
+                    ::rocket::http::Status::InternalServerError
+                })
             }
         }
     };
