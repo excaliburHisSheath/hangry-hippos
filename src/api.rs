@@ -4,10 +4,9 @@ use game::*;
 use rocket::http::Status;
 use rocket::response::*;
 use rocket::State;
-use rocket_contrib::JSON;
 
 /// The response sent back from the `/register-player` endpoint.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Responder)]
 pub struct RegisterPlayerResponse {
     /// The `PlayerId` that was generated for the new player.
     pub id: PlayerId,
@@ -26,7 +25,7 @@ pub fn register_player(
     player_id_generator: State<PlayerIdGenerator>,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
-) -> JSON<RegisterPlayerResponse>
+) -> RegisterPlayerResponse
 {
     let id = player_id_generator.next_id();
     let name = game::generate_username();
@@ -52,22 +51,18 @@ pub fn register_player(
     });
 
     // Respond to the client.
-    JSON(RegisterPlayerResponse {
-        id,
-        name,
-        score: 0,
-    })
+    RegisterPlayerResponse { id, name, score: 0 }
 }
 
 /// The request expected from the client for the `/feed-me` endpoint.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, FromData)]
 pub struct FeedMeRequest {
     /// The `PlayerId` for the player that clicked their "Feed Me" button.
     pub id: PlayerId,
 }
 
 /// The response sent back from the `/feed-me` endpoint.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Responder)]
 pub struct FeedMeResponse {
     pub score: usize,
 }
@@ -80,11 +75,10 @@ pub struct FeedMeResponse {
 /// Then `Err(InvalidPlayer)` is returned.
 #[post("/feed-me", format = "application/json", data = "<payload>")]
 pub fn feed_player(
-    payload: JSON<FeedMeRequest>,
+    payload: FeedMeRequest,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
-) -> Result<JSON<FeedMeResponse>> {
-    let payload = payload.into_inner();
+) -> Result<FeedMeResponse> {
     let id = payload.id;
 
     // Add 1 to the player's score, returning the new score. We create an explicit scope here to
@@ -104,10 +98,10 @@ pub fn feed_player(
 
     // Update the host displays and respond to the player.
     broadcaster.send(HostBroadcast::HippoEat { id, score });
-    Ok(JSON(FeedMeResponse { score }))
+    Ok(FeedMeResponse { score })
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Responder)]
 pub enum NoseGoesResponse {
     Survived,
     Died,
@@ -117,7 +111,7 @@ pub enum NoseGoesResponse {
 pub fn nose_goes(
     id: PlayerId,
     nose_goes: State<NoseGoesState>,
-) -> Result<JSON<NoseGoesResponse>> {
+) -> Result<NoseGoesResponse> {
     let mut nose_goes = nose_goes.lock().expect("Nose-goes state was poisoned!");
     match *nose_goes {
         NoseGoes::Inactive { .. } => {
@@ -134,9 +128,9 @@ pub fn nose_goes(
             // is the last one left, they die.
             if remaining_players.len() > 1 {
                 remaining_players.remove(&id);
-                Ok(JSON(NoseGoesResponse::Survived))
+                Ok(NoseGoesResponse::Survived)
             } else {
-                Ok(JSON(NoseGoesResponse::Died))
+                Ok(NoseGoesResponse::Died)
             }
         }
     }
@@ -146,7 +140,7 @@ pub fn nose_goes(
 ///
 /// Contains the list of current players and all information about each player, useful for giving
 /// new hosts the current state of the game.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Responder)]
 pub struct PlayersResponse {
     pub players: Vec<PlayerData>,
 }
@@ -172,7 +166,7 @@ pub struct PlayerData {
 /// This is used by new host connections to update thier display to match the current state of the
 /// game.
 #[get("/players")]
-pub fn get_players(players: State<PlayerMap>) -> JSON<PlayersResponse> {
+pub fn get_players(players: State<PlayerMap>) -> PlayersResponse {
     let players = players.read().expect("Player map was poisoned!");
     let players = players.values()
         .map(|player| {
@@ -184,7 +178,7 @@ pub fn get_players(players: State<PlayerMap>) -> JSON<PlayersResponse> {
         })
         .collect();
 
-    JSON(PlayersResponse { players })
+    PlayersResponse { players }
 }
 
 /// The error type for an API requests that can fail.
@@ -210,7 +204,7 @@ impl<'r> Responder<'r> for Error {
     fn respond(self) -> ::std::result::Result<Response<'r>, Status> {
         use rocket::response::status::Custom;
 
-        Custom(Status::BadRequest, JSON(self)).respond()
+        Custom(Status::BadRequest, ::rocket_contrib::JSON(self)).respond()
     }
 }
 
