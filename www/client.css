@@ -92,7 +92,7 @@ button {
     top: 0;
     left: 0;
 
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #poison-marble {
@@ -100,7 +100,17 @@ button {
     height: 100px;
     border-radius: 50px;
 
+    transform: translate(-50%, -50%);
+
     position: absolute;
 
     background-color: red;
+}
+
+#poison-marble-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
 }

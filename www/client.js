@@ -79,8 +79,8 @@ socket.onmessage = function(event) {
     if (payload === 'BeginNoseGoes') {
         app.noseGoes.isActive = true;
         app.noseGoes.showMarble = true;
-        app.noseGoes.marbleX = Math.random();
-        app.noseGoes.marbleY = Math.random();
+        app.noseGoes.marbleX = Math.random() * 0.5 + 0.25;
+        app.noseGoes.marbleY = Math.random() * 0.5 + 0.25;
     } else if (payload['EndNoseGoes']) {
         // TODO: Do some kind of animation when the player is the one who lost?
         app.noseGoes.isActive = false;

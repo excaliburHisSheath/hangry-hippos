@@ -63,7 +63,9 @@
                     v-if="noseGoes.showMarble"
                     v-bind:style="{ top: (noseGoes.marbleY * 100) + '%', left: (noseGoes.marbleX * 100) + '%' }"
                     v-on:click="poisonMarble"
-                ></div>
+                >
+                    <span id="poison-marble-text">Tap Me!</span>
+                </div>
             </div>
         </div>
 
