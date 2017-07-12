@@ -286,7 +286,7 @@ pub fn start_game_loop(
                     }
 
                     NoseGoes::InProgress { start_time, end_time, remaining_players } => {
-                        if now > end_time {
+                        if now > end_time || remaining_players.len() == 1 {
                             // Pick a random player to be the loser.
                             let loser = remaining_players
                             .iter()
