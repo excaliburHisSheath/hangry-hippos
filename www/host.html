@@ -39,13 +39,18 @@
 
     <body>
         <div id="vue-root">
-            <div id="top-side" class="horizontal-side">
+            <transition-group
+                id="top-side"
+                class="horizontal-side"
+                tag="div"
+                name="hippo"
+            >
                 <hippo-head
                     v-for="hippo in topHippos"
                     :key="hippo.player.id"
                     v-bind:hippo="hippo"
                 ></hippo-head>
-            </div>
+            </transition-group>
 
             <div id="right-side" class="vertical-side">
                 <hippo-head

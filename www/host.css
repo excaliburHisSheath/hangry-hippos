@@ -182,3 +182,17 @@ body {
     font-size: 300%;
     color: red;
 }
+
+.hippo-head {
+    transition: all 1s;
+}
+
+.hippo-enter, .hippo-leave-to {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.hippo-leave-active {
+    width: 0;
+    overflow: visible;
+}
