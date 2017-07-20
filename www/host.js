@@ -28,16 +28,6 @@ let app = new Vue({
             isActive: false,
         },
     },
-
-    methods: {
-        hippoEnter: function () {
-            console.log('Hippo entered');
-        },
-
-        hippoLeave: function () {
-            console.log('Hippo leaved');
-        },
-    }
 });
 
 Vue.component('hippo-head', {
