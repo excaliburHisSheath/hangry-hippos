@@ -187,12 +187,22 @@ body {
     transition: all 1s;
 }
 
-.hippo-enter, .hippo-leave-to {
+#top-side .hippo-enter, #top-side .hippo-leave-to {
     opacity: 0;
     transform: translateY(-100%);
 }
 
-.hippo-leave-active {
-    width: 0;
-    overflow: visible;
+#right-side .hippo-enter, #right-side .hippo-leave-to {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+#bottom-side .hippo-enter, #bottom-side .hippo-leave-to {
+    opacity: 0;
+    transform: translateY(100%);
+}
+
+#left-side .hippo-enter, #left-side .hippo-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
 }

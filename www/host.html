@@ -52,29 +52,44 @@
                 ></hippo-head>
             </transition-group>
 
-            <div id="right-side" class="vertical-side">
+            <transition-group
+                id="right-side"
+                class="vertical-side"
+                tag="div"
+                name="hippo"
+            >
                 <hippo-head
                     v-for="hippo in rightHippos"
                     :key="hippo.player.id"
                     v-bind:hippo="hippo"
                 ></hippo-head>
-            </div>
+            </transition-group>
 
-            <div id="bottom-side" class="horizontal-side">
+            <transition-group
+                id="bottom-side"
+                class="horizontal-side"
+                tag="div"
+                name="hippo"
+            >
                 <hippo-head
                     v-for="hippo in bottomHippos"
                     :key="hippo.player.id"
                     v-bind:hippo="hippo"
                 ></hippo-head>
-            </div>
+            </transition-group>
 
-            <div id="left-side" class="vertical-side">
+            <transition-group
+                id="left-side"
+                class="vertical-side"
+                tag="div"
+                name="hippo"
+            >
                 <hippo-head
                     v-for="hippo in leftHippos"
                     :key="hippo.player.id"
                     v-bind:hippo="hippo"
                 ></hippo-head>
-            </div>
+            </transition-group>
 
             <div id="attract-message" v-show="!noseGoes.isActive">
                 Go to <span id="site-address">http://hungryhipp.us/</span> to play!
