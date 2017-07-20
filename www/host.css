@@ -46,7 +46,6 @@ body {
 
 .horizontal-side, .vertical-side {
     display: flex;
-    justify-content: center;
     flex-wrap: nowrap;
 }
 
@@ -86,6 +85,10 @@ body {
     height: 100px;
     text-align: center;
 
+    /*
+     * Allow the hippo head container to expand, causing the hippos to space themselves evently
+     * along their side of the screen.
+     */
     flex-grow: 1;
 }
 
