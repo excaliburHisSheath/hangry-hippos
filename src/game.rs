@@ -1,12 +1,11 @@
 use broadcast::*;
-use rand::*;
+use rand::{self, Rng};
 use rocket::request::FromParam;
 use serde::*;
 use std::collections::{ HashMap, HashSet };
 use std::mem;
 use std::str::FromStr;
 use std::sync::*;
-use std::sync::atomic::*;
 use std::thread;
 use std::time::*;
 
@@ -24,6 +23,15 @@ use std::time::*;
 /// strings makes sense.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PlayerId(usize);
+
+impl PlayerId {
+    /// Generates a new, (probably) unique player ID.
+    ///
+    /// Player IDs are generated randomly in the u64 range. So they're probably unique. Probably.
+    pub fn new() -> PlayerId {
+        PlayerId(rand::random())
+    }
+}
 
 impl Serialize for PlayerId {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
@@ -47,20 +55,6 @@ impl<'a> FromParam<'a> for PlayerId {
     fn from_param(param: &'a ::rocket::http::RawStr) -> Result<PlayerId, Self::Error> {
         let inner = param.as_str().parse()?;
         Ok(PlayerId(inner))
-    }
-}
-
-/// Generator for `PlayerId`.
-///
-/// Meant to be managed as application state by Rocket. Only one should ever be created, and Rocket
-/// ensures that only one can ever be registered as managed state.
-#[derive(Debug, Default)]
-pub struct PlayerIdGenerator(AtomicUsize);
-
-impl PlayerIdGenerator {
-    /// Generate a unique ID for a player.
-    pub fn next_id(&self) -> PlayerId {
-        PlayerId(self.0.fetch_add(1, Ordering::Relaxed))
     }
 }
 
@@ -212,7 +206,7 @@ pub fn generate_username() -> String {
         "Chi-town Potamus",
     ];
 
-    thread_rng().choose(NAMES).unwrap().to_string()
+    rand::thread_rng().choose(NAMES).unwrap().to_string()
 }
 
 /// The current state for a single player.

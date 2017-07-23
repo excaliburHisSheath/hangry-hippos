@@ -77,7 +77,6 @@ fn main() {
             api::get_players,
             api::nose_goes,
         ])
-        .manage(PlayerIdGenerator::default())
         .manage(players)
         .manage(nose_goes)
         .manage(host_broadcaster)

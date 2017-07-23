@@ -5,29 +5,30 @@ use rocket::http::Status;
 use rocket::response::*;
 use rocket::State;
 
-/// The response sent back from the `/register-player` endpoint.
+/// The current state for a player that is needed by the host site.
+///
+/// This doesn't include all of the player's internal state data, only the information needed
+/// by the display site.
 #[derive(Debug, Serialize, Responder)]
-pub struct RegisterPlayerResponse {
-    /// The `PlayerId` that was generated for the new player.
-    pub id: PlayerId,
+pub struct PlayerData {
+    /// The player's ID.
+    id: PlayerId,
 
-    /// The display name for the player.
-    pub name: String,
+    /// The player's display name.
+    name: String,
 
-    /// The player's starting score.
-    pub score: usize,
+    /// The player's current score.
+    score: usize,
 }
 
 /// Generates a `PlayerId` for a new player.
 // TODO: Allow players to specify a username when registering.
 #[get("/register-player")]
 pub fn register_player(
-    player_id_generator: State<PlayerIdGenerator>,
     players: State<PlayerMap>,
     broadcaster: State<HostBroadcaster>,
-) -> RegisterPlayerResponse
-{
-    let id = player_id_generator.next_id();
+) -> PlayerData {
+    let id = PlayerId::new();
     let name = game::generate_username();
 
     let player = Player {
@@ -51,7 +52,7 @@ pub fn register_player(
     });
 
     // Respond to the client.
-    RegisterPlayerResponse { id, name, score: 0 }
+    PlayerData { id, name, score: 0 }
 }
 
 /// The request expected from the client for the `/feed-me` endpoint.
@@ -143,22 +144,6 @@ pub fn nose_goes(
 #[derive(Debug, Serialize, Responder)]
 pub struct PlayersResponse {
     pub players: Vec<PlayerData>,
-}
-
-/// The current state for a player that is needed by the host site.
-///
-/// This doesn't include all of the player's internal state data, only the information needed
-/// by the display site.
-#[derive(Debug, Serialize, Responder)]
-pub struct PlayerData {
-    /// The player's ID.
-    id: PlayerId,
-
-    /// The player's display name.
-    name: String,
-
-    /// The player's current score.
-    score: usize,
 }
 
 #[get("/player/<id>")]
