@@ -149,7 +149,7 @@ pub struct PlayersResponse {
 ///
 /// This doesn't include all of the player's internal state data, only the information needed
 /// by the display site.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Responder)]
 pub struct PlayerData {
     /// The player's ID.
     id: PlayerId,
@@ -159,6 +159,17 @@ pub struct PlayerData {
 
     /// The player's current score.
     score: usize,
+}
+
+#[get("/player/<id>")]
+pub fn get_player(id: PlayerId, players: State<PlayerMap>) -> Option<PlayerData> {
+    let players = players.read().expect("Player map was poisoned!");
+
+    players.get(&id).map(|player| PlayerData {
+        id: player.id,
+        name: player.name.clone(),
+        score: player.score,
+    })
 }
 
 /// Returns a list of players and their scores.

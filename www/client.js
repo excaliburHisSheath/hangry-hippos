@@ -95,6 +95,8 @@ socket.onmessage = function(event) {
         if (event.id === app.id) {
             app.score = event.score;
             app.isPlaying = false;
+
+            localStorage.removeItem('id');
         }
     } else {
         console.error('Unrecognized player event:', payload);
@@ -110,9 +112,31 @@ socket.onclose = function(event) {
     console.error('Socket closed I guess: ', event);
 };
 
-// Register the player with the backend.
-get('/api/register-player', response => {
-    app.id = response.id;
-    app.hippoName = response.name;
-    app.score = 0;
-});
+function registerPlayer() {
+    // Register the player with the backend.
+    get('/api/register-player', response => {
+        app.id = response.id;
+        app.hippoName = response.name;
+        app.score = response.score;
+
+        localStorage.setItem('id', response.id);
+    });
+}
+
+let cachedId = localStorage.getItem('id');
+if (cachedId != null) {
+    get(
+        `/api/player/${cachedId}`,
+        response => {
+            app.id = response.id;
+            app.hippoName = response.name;
+            app.score = response.score;
+        },
+
+        (error, status) => {
+            registerPlayer();
+        }
+    );
+} else {
+    registerPlayer();
+}

@@ -42,7 +42,7 @@ fn static_serve_display() -> io::Result<NamedFile> {
 ///
 /// Any requests that aren't matched against an API route and aren't the special case `/` and `/host`
 /// routes will be served as static files, returning a 404 error if the file doesn't exist.
-#[get("/<file..>")]
+#[get("/<file..>", rank = 1)]
 fn static_serve(file: PathBuf) -> io::Result<NamedFile> {
     NamedFile::open(Path::new("www/").join(file))
 }
@@ -73,6 +73,7 @@ fn main() {
         .mount("/api", routes![
             api::register_player,
             api::feed_player,
+            api::get_player,
             api::get_players,
             api::nose_goes,
         ])
