@@ -33,8 +33,8 @@ impl Serialize for PlayerId {
     }
 }
 
-impl Deserialize for PlayerId {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer {
+impl<'de> Deserialize<'de> for PlayerId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
         let string_id = String::deserialize(deserializer)?;
         let id_inner = string_id.parse().map_err(de::Error::custom)?;
         Ok(PlayerId(id_inner))
@@ -44,8 +44,8 @@ impl Deserialize for PlayerId {
 impl<'a> FromParam<'a> for PlayerId {
     type Error = <usize as FromStr>::Err;
 
-    fn from_param(param: &'a str) -> Result<PlayerId, Self::Error> {
-        let inner = param.parse()?;
+    fn from_param(param: &'a ::rocket::http::RawStr) -> Result<PlayerId, Self::Error> {
+        let inner = param.as_str().parse()?;
         Ok(PlayerId(inner))
     }
 }

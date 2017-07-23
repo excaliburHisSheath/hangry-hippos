@@ -201,10 +201,10 @@ pub enum Error {
 }
 
 impl<'r> Responder<'r> for Error {
-    fn respond(self) -> ::std::result::Result<Response<'r>, Status> {
+    fn respond_to(self, request: &::rocket::request::Request) -> ::std::result::Result<Response<'r>, Status> {
         use rocket::response::status::Custom;
 
-        Custom(Status::BadRequest, ::rocket_contrib::JSON(self)).respond()
+        Custom(Status::BadRequest, ::rocket_contrib::Json(self)).respond_to(request)
     }
 }
 

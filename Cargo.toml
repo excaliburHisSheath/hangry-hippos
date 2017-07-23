@@ -5,11 +5,11 @@ version = "0.4.0"
 
 [dependencies]
 rand = "0.3.15"
-rocket = "0.2.8"
-rocket_codegen = "0.2.8"
-rocket_contrib = "0.2.8"
-serde = "0.9"
-serde_derive = "0.9"
-serde_json = "0.9"
+rocket = "0.3"
+rocket_codegen = "0.3"
+rocket_contrib = "0.3"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
 ws = "0.7.3"
-rocket-derive-json = { path = "./lib/rocket-derive-json" }
+rocket_derive = { git = "https://github.com/excaliburHisSheath/rocket_derive" }
