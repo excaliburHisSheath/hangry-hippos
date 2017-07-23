@@ -4,6 +4,7 @@
 //! one needs.
 
 use game::*;
+use std::collections::HashSet;
 use std::sync::*;
 use std::thread;
 use std::time::*;
@@ -42,13 +43,13 @@ pub enum HostBroadcast {
         duration: Duration,
 
         /// The players that are participating in the event.
-        players: Vec<PlayerId>,
+        players: HashSet<PlayerId>,
     },
 
-    /// A nose-goes event has ended, and a player has been knocked out.
+    /// A nose-goes event has ended, and one or more players have been knocked out.
     EndNoseGoes {
-        /// The player that got knocked out at the end of the event.
-        loser: PlayerId,
+        /// The players that have been knocked out. Will always have at least one member.
+        losers: HashSet<PlayerId>,
     },
 }
 
@@ -58,10 +59,10 @@ pub enum PlayerBroadcast {
     /// A nose-goes event has begun, and the player should be prompted to participate.
     BeginNoseGoes,
 
-    /// A nose-goes event has finished, and a player has been knocked out.
-    EndNoseGoes {
-        loser: PlayerId,
-    },
+    /// A nose-goes event has finished, and one or more playeres have been knocked out.
+    ///
+    /// One `PlayerLose` event will also be sent for each knocked-out player.
+    EndNoseGoes,
 
     /// A player has lost the game and has been removed.
     PlayerLose {

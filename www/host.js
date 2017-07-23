@@ -100,12 +100,14 @@ socket.onmessage = (event) => {
 
         TweenMax.fromTo(element, .2, from, to);
     } else if (payload['BeginNoseGoes']) {
-        let info = payload['BeginNoseGoes'];
         app.noseGoes.isActive = true;
     } else if (payload['EndNoseGoes']) {
-        let info = payload['EndNoseGoes'];
         app.noseGoes.isActive = false;
-        removePlayer(info.loser);
+
+        let info = payload['EndNoseGoes'];
+        for (let loser of info.losers) {
+            removePlayer(loser);
+        }
     } else {
         console.error('Unrecognized host event:', payload);
     }

@@ -265,7 +265,7 @@ pub fn start_game_loop(
 
                                 host_broadcaster.send(HostBroadcast::BeginNoseGoes {
                                     duration: nose_goes_duration,
-                                    players: remaining_players.iter().cloned().collect(),
+                                    players: remaining_players.clone(),
                                 });
                                 player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
 
@@ -287,24 +287,20 @@ pub fn start_game_loop(
 
                     NoseGoes::InProgress { start_time, end_time, remaining_players } => {
                         if now > end_time || remaining_players.len() == 1 {
-                            // Pick a random player to be the loser.
-                            let loser = remaining_players
-                            .iter()
-                            .nth(thread_rng().gen_range(0, remaining_players.len()))
-                            .cloned()
-                            .unwrap();
-
                             // Remove the player from the player map.
                             let mut players = players.write().expect("Player map was poisoned");
-                            let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
+
+                            for loser in &remaining_players {
+                                let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
+                                player_broadcaster.send(PlayerBroadcast::PlayerLose {
+                                    id: *loser,
+                                    score: loser_info.score,
+                                });
+                            }
 
                             // Broadcast player loss to players and hosts.
-                            host_broadcaster.send(HostBroadcast::EndNoseGoes { loser });
-                            player_broadcaster.send(PlayerBroadcast::EndNoseGoes { loser });
-                            player_broadcaster.send(PlayerBroadcast::PlayerLose {
-                                id: loser,
-                                score: loser_info.score,
-                            });
+                            host_broadcaster.send(HostBroadcast::EndNoseGoes { losers: remaining_players });
+                            player_broadcaster.send(PlayerBroadcast::EndNoseGoes);
 
                             NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
                         } else {
