@@ -298,3 +298,24 @@ body {
     transform: translate(-50%, -50%) scale(2);
     opacity: 0;
 }
+
+/* Crown animation configuration. */
+/* ============================== */
+
+.crown-enter-active {
+    transition: all 0.5s;
+}
+
+.crown-enter {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(5);
+}
+
+.crown-leave-active {
+    transition: all 1s;
+}
+
+.crown-leave-to {
+    opacity: 0;
+    transform: translate(-50%, 50%);
+}

@@ -208,7 +208,6 @@ function determineLeader() {
     let leader;
     for (let key in app.hippoMap) {
         let hippo = app.hippoMap[key];
-        console.log('hippo score:', hippo.player.score);
         hippo.hasCrown = false;
         if (leader == null || hippo.player.score > leader.player.score) {
             leader = hippo;
@@ -217,6 +216,5 @@ function determineLeader() {
 
     if (leader != null) {
         leader.hasCrown = true;
-        console.log('leader score:', leader.player.score);
     }
 }
