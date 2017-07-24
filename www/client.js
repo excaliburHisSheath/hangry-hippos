@@ -9,6 +9,7 @@ let app = new Vue({
         hippoName: null,
         score: null,
         isPlaying: true,
+        hasCrown: false,
         noseGoes: {
             isActive: false,
             showMarble: true,

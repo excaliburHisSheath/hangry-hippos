@@ -46,7 +46,7 @@
 
             <div id="game-screen" class="screen" v-if="isPlaying">
                 <h2 class="hippo-name">{{ hippoName }}</h2>
-                <div id="tap-text">Tap anywhere to feed your hippo!</div>
+                <div id="tap-text">Tap anywhere!</div>
                 <div id="score-text">Score: {{ score }}</div>
             </div>
 
@@ -66,6 +66,13 @@
                 >
                     <span id="poison-marble-text">Tap Me!</span>
                 </div>
+            </div>
+
+            <div id="hippo-root">
+                <img class="head" src="assets/hippo.png">
+                <transition name="crown">
+                    <img class="crown" src="assets/crown.png" v-if="hasCrown">
+                </transition>
             </div>
         </div>
 

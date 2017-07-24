@@ -4,6 +4,9 @@ body {
     padding: 0;
     margin: 0;
     overflow: hidden;
+
+    background-color: #61a498;
+    background-image: url('assets/host_background.jpg');
 }
 
 h1 {
@@ -113,4 +116,44 @@ button {
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
+}
+
+#hippo-root {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 40%);
+
+    z-index: -1;
+}
+
+.crown {
+    position: absolute;
+
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -60%);
+
+    width: 70%;
+}
+
+/* Crown animation configuration. */
+/* ============================== */
+
+.crown-enter-active {
+    transition: all 1s;
+}
+
+.crown-enter {
+    opacity: 0;
+    transform: translate(-50%, -300%);
+}
+
+.crown-leave-active {
+    transition: all 1s;
+}
+
+.crown-leave-to {
+    opacity: 0;
+    transform: translate(-50%, 50%);
 }
