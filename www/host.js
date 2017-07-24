@@ -45,10 +45,10 @@ Vue.component('hippo-head', {
             <div class="score">{{ hippo.player.score }}</div>
         </div>
         <div class="head-image-root" :id="hippo.player.id">
+            <img src="assets/hippo.png" class="head">
             <transition name="crown">
-                <img src="assets/hippo.png" class="head">
+                <img src="assets/crown.png" class="crown" v-if="hippo.hasCrown">
             </transition>
-            <img src="assets/crown.png" class="crown">
         </div>
         <transition name="poison">
             <div class="poison-pill" :id="'poison-' + hippo.player.id" v-if="hippo.isDead"></div>
@@ -90,6 +90,8 @@ socket.onmessage = (event) => {
 
         // Updated the local score for the player.
         hippo.player.score = info.score;
+
+        determineLeader();
 
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on, so we dynamically set the
@@ -145,12 +147,15 @@ function addPlayer(player) {
         player: player,
         side: side,
         isDead: false,
+        hasCrown: false,
     };
 
     // Add the hippo to the hippo map and its side of the screen.
     assert(app.hippoMap[player.id] == null, 'Hippo already exists for ID: ' + player.id);
     app.hippoMap[player.id] = hippo;
     side.array.push(hippo);
+
+    determineLeader();
 }
 
 /**
@@ -159,6 +164,7 @@ function addPlayer(player) {
 function removePlayer(player) {
     let hippo = app.hippoMap[player];
     hippo.isDead = true;
+    hippo.hasCrown = false;
     app.deathMessage.isActive = true;
     app.deathMessage.hippoName = hippo.player.name;
 
@@ -170,6 +176,8 @@ function removePlayer(player) {
         // Remove the hippo from its side of the screen.
         let index = hippo.side.array.indexOf(hippo);
         hippo.side.array.splice(index, 1);
+
+        determineLeader();
     });
 
     setTimeout(() => { app.deathMessage.isActive = false; }, 5000);
@@ -195,3 +203,20 @@ TweenMax.fromTo(
     { rotation: -2 },
     { rotation: 2, repeat: -1, yoyo: true },
 );
+
+function determineLeader() {
+    let leader;
+    for (let key in app.hippoMap) {
+        let hippo = app.hippoMap[key];
+        console.log('hippo score:', hippo.player.score);
+        hippo.hasCrown = false;
+        if (leader == null || hippo.player.score > leader.player.score) {
+            leader = hippo;
+        }
+    }
+
+    if (leader != null) {
+        leader.hasCrown = true;
+        console.log('leader score:', leader.player.score);
+    }
+}
