@@ -91,8 +91,6 @@ socket.onmessage = (event) => {
         // Updated the local score for the player.
         hippo.player.score = info.score;
 
-        determineLeader();
-
         // Animate the hippo head to match the score increase. The direction of the chomp animation
         // depends on the side of the screen that the hippo is on, so we dynamically set the
         // animation property that moves the hippo relative to its side of the screen.
@@ -115,6 +113,14 @@ socket.onmessage = (event) => {
         for (let loser of info.losers) {
             removePlayer(loser);
         }
+    } else if (payload['UpdateWinner']) {
+        for (let key in app.hippoMap) {
+            let hippo = app.hippoMap[key];
+            hippo.hasCrown = false;
+        }
+
+        let winner = payload['UpdateWinner'].id;
+        app.hippoMap[winner].hasCrown = true;
     } else {
         console.error('Unrecognized host event:', payload);
     }
@@ -147,15 +153,13 @@ function addPlayer(player) {
         player: player,
         side: side,
         isDead: false,
-        hasCrown: false,
+        hasCrown: player.has_crown,
     };
 
     // Add the hippo to the hippo map and its side of the screen.
     assert(app.hippoMap[player.id] == null, 'Hippo already exists for ID: ' + player.id);
     app.hippoMap[player.id] = hippo;
     side.array.push(hippo);
-
-    determineLeader();
 }
 
 /**
@@ -176,8 +180,6 @@ function removePlayer(player) {
         // Remove the hippo from its side of the screen.
         let index = hippo.side.array.indexOf(hippo);
         hippo.side.array.splice(index, 1);
-
-        determineLeader();
     });
 
     setTimeout(() => { app.deathMessage.isActive = false; }, 5000);
@@ -203,24 +205,3 @@ TweenMax.fromTo(
     { rotation: -2 },
     { rotation: 2, repeat: -1, yoyo: true },
 );
-
-/*
- * Updates tracking for the current leader.
- *
- * Sets the `hasCrown` flag for each hippo to `false`, then sets only the leader's flag to `true`.
- * This should be called after any change to game state that could impact who's in the lead.
- */
-function determineLeader() {
-    let leader;
-    for (let key in app.hippoMap) {
-        let hippo = app.hippoMap[key];
-        hippo.hasCrown = false;
-        if (leader == null || hippo.player.score > leader.player.score) {
-            leader = hippo;
-        }
-    }
-
-    if (leader != null) {
-        leader.hasCrown = true;
-    }
-}
