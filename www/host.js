@@ -204,6 +204,12 @@ TweenMax.fromTo(
     { rotation: 2, repeat: -1, yoyo: true },
 );
 
+/*
+ * Updates tracking for the current leader.
+ *
+ * Sets the `hasCrown` flag for each hippo to `false`, then sets only the leader's flag to `true`.
+ * This should be called after any change to game state that could impact who's in the lead.
+ */
 function determineLeader() {
     let leader;
     for (let key in app.hippoMap) {
