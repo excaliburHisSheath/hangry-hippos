@@ -58,6 +58,8 @@ impl<'a> FromParam<'a> for PlayerId {
     }
 }
 
+pub type Winner = Arc<Mutex<Option<PlayerId>>>;
+
 /// Generates a random username for new players.
 ///
 /// Names are chosen from a pre-written list of guaranteed-funny names.
@@ -230,6 +232,7 @@ pub type PlayerMap = Arc<RwLock<HashMap<PlayerId, Player>>>;
 pub fn start_game_loop(
     players: PlayerMap,
     nose_goes: NoseGoesState,
+    winner: Winner,
     host_broadcaster: HostBroadcaster,
     player_broadcaster: PlayerBroadcaster,
 ) {
@@ -282,7 +285,7 @@ pub fn start_game_loop(
                     NoseGoes::InProgress { start_time, end_time, remaining_players } => {
                         if now > end_time || remaining_players.len() == 1 {
                             // Remove the player from the player map.
-                            let mut players = players.write().expect("Player map was poisoned");
+                            let mut players = players.write().expect("Player map was poisoned!");
 
                             for loser in &remaining_players {
                                 let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
@@ -291,6 +294,32 @@ pub fn start_game_loop(
                                     score: loser_info.score,
                                 });
                             }
+
+                            let mut winner = winner.lock().expect("Winner was poisoned!");
+                            let new_winner = players.iter()
+                                .fold(None, |winner, (id, player)| {
+                                    match winner {
+                                        Some((id, score)) => {
+                                            if player.score > score {
+                                                Some((id, player.score))
+                                            } else {
+                                                winner
+                                            }
+                                        }
+
+                                        None => { Some((id, player.score)) }
+                                    }
+                                })
+                                .map(|(&id, _)| id);
+
+                            if new_winner != *winner {
+                                if let Some(id) = new_winner {
+                                    host_broadcaster.send(HostBroadcast::UpdateWinner { id });
+                                    player_broadcaster.send(PlayerBroadcast::UpdateWinner { id });
+                                }
+                            }
+
+                            *winner = new_winner;
 
                             // Broadcast player loss to players and hosts.
                             host_broadcaster.send(HostBroadcast::EndNoseGoes { losers: remaining_players });

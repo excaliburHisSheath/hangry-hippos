@@ -4,6 +4,7 @@ use game::*;
 use rocket::http::Status;
 use rocket::response::*;
 use rocket::State;
+use std::mem;
 
 /// The current state for a player that is needed by the host site.
 ///
@@ -19,6 +20,9 @@ pub struct PlayerData {
 
     /// The player's current score.
     score: usize,
+
+    /// Whether or not the player has the crown (i.e. if the player is winning).
+    has_crown: bool,
 }
 
 /// Generates a `PlayerId` for a new player.
@@ -26,33 +30,43 @@ pub struct PlayerData {
 #[get("/register-player")]
 pub fn register_player(
     players: State<PlayerMap>,
-    broadcaster: State<HostBroadcaster>,
+    winner: State<Winner>,
+    host_broadcaster: State<HostBroadcaster>,
+    player_broadcaster: State<PlayerBroadcaster>,
 ) -> PlayerData {
     let id = PlayerId::new();
     let name = game::generate_username();
+    let score = 0;
 
     let player = Player {
         id,
         name: name.clone(),
-        score: 0,
+        score,
     };
 
     // Add the player to the game state.
-    {
-        let mut players = players.write().expect("Players map was poisoned!");
-        let old = players.insert(id, player);
-        assert!(old.is_none(), "Player ID was registered twice");
-    }
+    let mut players = players.write().expect("Players map was poisoned!");
+    let old = players.insert(id, player);
+    assert!(old.is_none(), "Player ID was registered twice");
 
     // Broadcast to all hosts that a new player has joined.
-    broadcaster.send(HostBroadcast::PlayerRegister {
+    host_broadcaster.send(HostBroadcast::PlayerRegister {
         id,
         name: name.clone(),
-        score: 0,
+        score,
     });
 
+    // Update winner if this is the first player.
+    let mut winner = winner.lock().expect("Winner was poisoned!");
+    let has_crown = winner.is_none();
+    if winner.is_none() {
+        *winner = Some(id);
+        host_broadcaster.send(HostBroadcast::UpdateWinner { id });
+        player_broadcaster.send(PlayerBroadcast::UpdateWinner { id });
+    }
+
     // Respond to the client.
-    PlayerData { id, name, score: 0 }
+    PlayerData { id, name, score, has_crown }
 }
 
 /// The request expected from the client for the `/feed-me` endpoint.
@@ -78,17 +92,19 @@ pub struct FeedMeResponse {
 pub fn feed_player(
     payload: FeedMeRequest,
     players: State<PlayerMap>,
-    broadcaster: State<HostBroadcaster>,
+    winner: State<Winner>,
+    host_broadcaster: State<HostBroadcaster>,
+    player_broadcaster: State<PlayerBroadcaster>,
 ) -> Result<FeedMeResponse> {
     let id = payload.id;
 
     // Add 1 to the player's score, returning the new score. We create an explicit scope here to
     // limit how long we hold the lock on the player map.
-    let score = {
-        let mut players = players.write().expect("Player map was poisoned");
+    let mut players = players.write().expect("Player map was poisoned!");
 
-        // Get the player's current score, or return an `InvalidPlayer` error if it's not in
-        // the scoreboard.
+    // Get the player's current score, or return an `InvalidPlayer` error if it's not in
+    // the scoreboard.
+    let score = {
         let player = players
             .get_mut(&id)
             .ok_or(Error::InvalidPlayer(id))?;
@@ -97,8 +113,19 @@ pub fn feed_player(
         player.score
     };
 
-    // Update the host displays and respond to the player.
-    broadcaster.send(HostBroadcast::HippoEat { id, score });
+    // Update the host displays.
+    host_broadcaster.send(HostBroadcast::HippoEat { id, score });
+
+    let mut winner = winner.lock().expect("Winner was poisoned!");
+    let winner = winner.as_mut().expect("There must be a winner if a hippo is being fed");
+    let winner_score = players.get(winner).unwrap().score;
+    if score > winner_score && id != *winner {
+        // Make the current player the new winner.
+        mem::replace(winner, id);
+        host_broadcaster.send(HostBroadcast::UpdateWinner { id });
+        player_broadcaster.send(PlayerBroadcast::UpdateWinner { id });
+    }
+
     Ok(FeedMeResponse { score })
 }
 
@@ -147,13 +174,19 @@ pub struct PlayersResponse {
 }
 
 #[get("/player/<id>")]
-pub fn get_player(id: PlayerId, players: State<PlayerMap>) -> Option<PlayerData> {
+pub fn get_player(
+    id: PlayerId,
+    players: State<PlayerMap>,
+    winner: State<Winner>,
+) -> Option<PlayerData> {
     let players = players.read().expect("Player map was poisoned!");
+    let winner = winner.lock().expect("Winner was poisoned!");
 
     players.get(&id).map(|player| PlayerData {
         id: player.id,
         name: player.name.clone(),
         score: player.score,
+        has_crown: Some(player.id) == *winner,
     })
 }
 
@@ -162,14 +195,16 @@ pub fn get_player(id: PlayerId, players: State<PlayerMap>) -> Option<PlayerData>
 /// This is used by new host connections to update thier display to match the current state of the
 /// game.
 #[get("/players")]
-pub fn get_players(players: State<PlayerMap>) -> PlayersResponse {
+pub fn get_players(players: State<PlayerMap>, winner: State<Winner>) -> PlayersResponse {
     let players = players.read().expect("Player map was poisoned!");
+    let winner = winner.lock().expect("Winner was poisoned!");
     let players = players.values()
         .map(|player| {
             PlayerData {
                 id: player.id,
                 name: player.name.clone(),
                 score: player.score,
+                has_crown: Some(player.id) == *winner,
             }
         })
         .collect();

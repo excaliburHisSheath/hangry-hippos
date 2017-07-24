@@ -56,9 +56,11 @@ fn main() {
 
     let players = PlayerMap::default();
     let nose_goes = NoseGoesState::default();
+    let winner = Winner::default();
     game::start_game_loop(
         players.clone(),
         nose_goes.clone(),
+        winner.clone(),
         host_broadcaster.clone(),
         player_broadcaster.clone(),
     );
@@ -81,5 +83,6 @@ fn main() {
         .manage(nose_goes)
         .manage(host_broadcaster)
         .manage(player_broadcaster)
+        .manage(winner)
         .launch();
 }

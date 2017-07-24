@@ -51,6 +51,10 @@ pub enum HostBroadcast {
         /// The players that have been knocked out. Will always have at least one member.
         losers: HashSet<PlayerId>,
     },
+
+    UpdateWinner {
+        id: PlayerId,
+    }
 }
 
 /// A message to be broadcast to connected player clients.
@@ -72,6 +76,10 @@ pub enum PlayerBroadcast {
         /// The final score for the player that lost.
         score: usize,
     },
+
+    UpdateWinner {
+        id: PlayerId,
+    }
 }
 
 /// Broadcasts messages to websocket subscribers.

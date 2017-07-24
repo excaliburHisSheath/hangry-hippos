@@ -99,6 +99,9 @@ socket.onmessage = function(event) {
 
             localStorage.removeItem('id');
         }
+    } else if (payload['UpdateWinner']) {
+        let event = payload['UpdateWinner'];
+        app.hasCrown = (event.id == app.id);
     } else {
         console.error('Unrecognized player event:', payload);
     }
@@ -119,6 +122,7 @@ function registerPlayer() {
         app.id = response.id;
         app.hippoName = response.name;
         app.score = response.score;
+        app.hasCrown = response.has_crown;
 
         localStorage.setItem('id', response.id);
     });
@@ -132,6 +136,7 @@ if (cachedId != null) {
             app.id = response.id;
             app.hippoName = response.name;
             app.score = response.score;
+            app.hasCrown = response.has_crown;
         },
 
         (error, status) => {
