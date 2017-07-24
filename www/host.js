@@ -39,12 +39,17 @@ Vue.component('hippo-head', {
     props: ['hippo'],
 
     template: `
-    <div class="hippo-head">
+    <div class="hippo-head-root">
         <div class="hippo-text">
             <div class="name">{{ hippo.player.name }}</div>
             <div class="score">{{ hippo.player.score }}</div>
         </div>
-        <img src="assets/hippo.png" class="hippo-head-image" :id="hippo.player.id">
+        <div class="head-image-root" :id="hippo.player.id">
+            <transition name="crown">
+                <img src="assets/hippo.png" class="head">
+            </transition>
+            <img src="assets/crown.png" class="crown">
+        </div>
         <transition name="poison">
             <div class="poison-pill" :id="'poison-' + hippo.player.id" v-if="hippo.isDead"></div>
         </transition>

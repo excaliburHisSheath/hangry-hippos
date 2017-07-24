@@ -76,8 +76,7 @@ body {
     height: 100%;
 }
 
-.hippo-head {
-
+.hippo-head-root {
     /* We use flexbox to position the label on the outside and the hippo head on the inside. */
     display: flex;
 
@@ -100,20 +99,30 @@ body {
  * Specify a base size for the hippo head. This allows for the enter/exit transitions to
  * animate the hippo's size smoothly.
  */
-.horizontal-side .hippo-head {
+.horizontal-side .hippo-head-root {
     width: 100px;
 }
 
-.vertical-side .hippo-head {
+.vertical-side .hippo-head-root {
     height: 100px;
 }
 
-.hippo-head-image {
+.head-image-root {
+    position: relative;
+}
+
+.head {
     display: block;
     width: 100px;
+}
 
-    /* Make the position relative so we can tween its position with top, right, left, bottom. */
-    position: relative;
+.crown {
+    width: 75px;
+
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -60%);
 }
 
 .hippo-text {
@@ -162,34 +171,34 @@ body {
 }
 
 /* Top side styles. */
-#top-side .hippo-head {
+#top-side .hippo-head-root {
     flex-direction: column;
 }
 
 /* Right side styles. */
-#right-side .hippo-head {
+#right-side .hippo-head-root {
     flex-direction: row-reverse;
 }
 
-#right-side .hippo-head-image {
+#right-side .head-image-root {
     transform: rotate(90deg);
 }
 
 /* Bottom side styles. */
-#bottom-side .hippo-head {
+#bottom-side .hippo-head-root {
     flex-direction: column-reverse;
 }
 
-#bottom-side .hippo-head-image {
+#bottom-side .head-image-root {
     transform: rotate(180deg);
 }
 
 /* Left side styles. */
-#left-side .hippo-head {
+#left-side .hippo-head-root {
     flex-direction: row;
 }
 
-#left-side .hippo-head-image {
+#left-side .head-image-root {
     transform: rotate(-90deg);
 }
 
@@ -230,7 +239,7 @@ body {
 /* Enter and exit transition configurations. */
 /* ========================================= */
 
-.hippo-head {
+.hippo-head-root {
     transition: all 1s;
 }
 
