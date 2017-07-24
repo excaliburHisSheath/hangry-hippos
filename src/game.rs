@@ -58,6 +58,17 @@ impl<'a> FromParam<'a> for PlayerId {
     }
 }
 
+/// Type alias for a shareable `Option<PlayerId>` representing the curent winner.
+///
+/// # Examples
+///
+/// ```
+/// #[post("/winner/<id>")]
+/// fn set_winner(id: PlayerId, winner: State<Winner>) {
+///     let mut winner = winner.lock().expect("Winner was poisoned!");
+///     *winner = Some(id);
+/// }
+/// ```
 pub type Winner = Arc<Mutex<Option<PlayerId>>>;
 
 /// Generates a random username for new players.
@@ -286,7 +297,6 @@ pub fn start_game_loop(
                         if now > end_time || remaining_players.len() == 1 {
                             // Remove the player from the player map.
                             let mut players = players.write().expect("Player map was poisoned!");
-
                             for loser in &remaining_players {
                                 let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
                                 player_broadcaster.send(PlayerBroadcast::PlayerLose {
@@ -295,6 +305,7 @@ pub fn start_game_loop(
                                 });
                             }
 
+                            // Recalculate the new winner after all losers have been removed.
                             let mut winner = winner.lock().expect("Winner was poisoned!");
                             let new_winner = players.iter()
                                 .fold(None, |winner, (id, player)| {

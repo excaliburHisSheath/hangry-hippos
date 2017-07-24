@@ -52,6 +52,7 @@ pub enum HostBroadcast {
         losers: HashSet<PlayerId>,
     },
 
+    /// A new player has taken the lead.
     UpdateWinner {
         id: PlayerId,
     }
@@ -77,6 +78,7 @@ pub enum PlayerBroadcast {
         score: usize,
     },
 
+    /// A new player has taken the lead.
     UpdateWinner {
         id: PlayerId,
     }

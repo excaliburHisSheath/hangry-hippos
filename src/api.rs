@@ -4,7 +4,6 @@ use game::*;
 use rocket::http::Status;
 use rocket::response::*;
 use rocket::State;
-use std::mem;
 
 /// The current state for a player that is needed by the host site.
 ///
@@ -121,7 +120,7 @@ pub fn feed_player(
     let winner_score = players.get(winner).unwrap().score;
     if score > winner_score && id != *winner {
         // Make the current player the new winner.
-        mem::replace(winner, id);
+        *winner = id;
         host_broadcaster.send(HostBroadcast::UpdateWinner { id });
         player_broadcaster.send(PlayerBroadcast::UpdateWinner { id });
     }
