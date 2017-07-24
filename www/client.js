@@ -36,13 +36,13 @@ let app = new Vue({
                 '#tap-text',
                 0.1,
                 { scale: 1 },
-                { scale: 1.2, yoyo: true, repeat: 1 },
+                { scale: 1.5, yoyo: true, repeat: 1 },
             );
             TweenMax.fromTo(
                 '#tap-text',
                 0.1,
                 { rotation: 0 },
-                { rotation: Math.random() * 6 - 3, yoyo: true, repeat: 1 },
+                { rotation: Math.random() * 10 - 5, yoyo: true, repeat: 1 },
             );
         },
 

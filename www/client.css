@@ -7,23 +7,8 @@ body {
 
     background-color: #61a498;
     background-image: url('assets/host_background.jpg');
-}
 
-h1 {
-    margin: 0;
-}
-
-h2 {
-    margin: 0;
-}
-
-#app-root {
-    width: 100vw;
-    height: 100vh;
-    box-sizing: border-box;
-
-    overflow: hidden;
-
+    /* Disable text selection so the user doesn't accidentally highlight text while tapping. */
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
@@ -31,8 +16,20 @@ h2 {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 
+    overflow: hidden;
+
     font-family: 'Baloo', cursive;
     text-align: center;
+}
+
+h1 {
+    font-size: 200%;
+}
+
+#app-root {
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
 
     padding: 20px;
 }
@@ -58,8 +55,18 @@ h2 {
     width: calc(100% - 40px);
 }
 
+#hippo-name {
+    color: #bc00a6;
+    font-size: 170%
+}
+
 #tap-text {
     font-size: 200%;
+}
+
+#score-text {
+    color: #bc00a6;
+    font-size: 170%;
 }
 
 #lose-screen {
@@ -82,9 +89,6 @@ button {
     border-radius: 5px;
 }
 
-.hippo-name {
-    color: #bc00a6;
-}
 
 #nose-goes-overlay {
     width: 100vw;
@@ -135,6 +139,22 @@ button {
     transform: translate(-50%, -60%);
 
     width: 70%;
+}
+
+/* Score animation configuration. */
+/* ============================== */
+
+#score-text {
+    transition: all 0.2s;
+}
+
+.score-enter {
+    opacity: 0;
+    transform: scale(3);
+}
+
+.score-leave-active {
+    display: none;
 }
 
 /* Crown animation configuration. */

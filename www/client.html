@@ -45,9 +45,11 @@
             <h1>HungryHipp.us</h1>
 
             <div id="game-screen" class="screen" v-if="isPlaying">
-                <h2 class="hippo-name">{{ hippoName }}</h2>
+                <div id="hippo-name">{{ hippoName }}</div>
                 <div id="tap-text">Tap anywhere!</div>
-                <div id="score-text">Score: {{ score }}</div>
+                <transition name="score">
+                    <div id="score-text" :key="score">{{ score }}</div>
+                </transition>
             </div>
 
             <div id="lose-screen" class="screen" v-if="!isPlaying">
@@ -68,7 +70,7 @@
                 </div>
             </div>
 
-            <div id="hippo-root">
+            <div id="hippo-root" v-if="isPlaying">
                 <img class="head" src="assets/hippo.png">
                 <transition name="crown">
                     <img class="crown" src="assets/crown.png" v-if="hasCrown">
