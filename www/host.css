@@ -303,7 +303,8 @@ body {
 /* ============================== */
 
 .crown-enter-active {
-    transition: all 0.5s;
+    transition: all 0.3s;
+    transition-timing-function: ease-in;
 }
 
 .crown-enter {
