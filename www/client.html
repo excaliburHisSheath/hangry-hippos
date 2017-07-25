@@ -62,18 +62,24 @@
                 <button v-on:click.stop="reload">Play Again</button>
             </div>
 
-            <div id="nose-goes-overlay" v-if="noseGoes.isActive">
+            <div id="nose-goes-overlay" v-show="noseGoes.isActive">
                 <div
                     id="poison-marble"
-                    v-if="noseGoes.showMarble"
+                    v-show="noseGoes.showMarble"
                     v-bind:style="{ top: (noseGoes.marbleY * 100) + '%', left: (noseGoes.marbleX * 100) + '%' }"
                     v-on:click="poisonMarble"
                 >
                     <span id="poison-marble-text">Tap Me!</span>
                 </div>
+                <div
+                    id="poison-marble-flash"
+                    v-show="noseGoes.showMarble"
+                    v-bind:style="{ top: (noseGoes.marbleY * 100) + '%', left: (noseGoes.marbleX * 100) + '%' }"
+                >
+                </div>
             </div>
 
-            <transition appear name="hippo">
+            <transition name="hippo" appear>
                 <div id="hippo-root" v-if="isPlaying">
                     <img class="head" src="assets/hippo.png">
                     <transition name="crown">

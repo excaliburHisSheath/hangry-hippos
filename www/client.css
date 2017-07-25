@@ -47,6 +47,11 @@ h2 {
         font-size: 5vw;
     }
 
+    #poison-marble, #poison-marble-flash {
+        width: 20vw;
+        height: 20vw;
+    }
+
     #game-over-skull {
         height: 70vw;
     }
@@ -55,6 +60,11 @@ h2 {
 @media (orientation: landscape) {
     * {
         font-size: 5vh;
+    }
+
+    #poison-marble, #poison-marble-flash {
+        width: 20vh;
+        height: 20vh;
     }
 
     #game-over-skull {
@@ -132,16 +142,18 @@ button {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-#poison-marble {
-    width: 100px;
-    height: 100px;
-    border-radius: 50px;
-
-    transform: translate(-50%, -50%);
+#poison-marble, #poison-marble-flash {
+    border-radius: 50%;
 
     position: absolute;
+    transform: translate(-50%, -50%);
 
     background-color: red;
+    color: white;
+}
+
+#poison-marble {
+    z-index: 1;
 }
 
 #poison-marble-text {
@@ -190,8 +202,12 @@ button {
 /* Hippo head animation configuration. */
 /* =================================== */
 
-.hippo-leave-active {
+.hippo-enter-active, .hippo-leave-active {
     transition: all 1s;
+}
+
+#hippo-root.hippo-enter {
+    transform: translate(-50%, 100%);
 }
 
 #hippo-root.hippo-leave-to {

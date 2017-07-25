@@ -146,3 +146,22 @@ if (cachedId != null) {
 } else {
     registerPlayer();
 }
+
+// Start the poison marble fidget animation.
+let poisonMarbleElement = document.getElementById('poison-marble');
+TweenMax.to(poisonMarbleElement, 0.13, { scale: 1.3, repeat: -1, yoyo: true });
+TweenMax.fromTo(
+    poisonMarbleElement,
+    0.1,
+    { rotation: -4 },
+    { rotation: 4, repeat: -1, yoyo: true },
+);
+
+// Start the poison marble flash animation.
+let poisonMarbleFlashElement = document.getElementById('poison-marble-flash');
+TweenMax.fromTo(
+    poisonMarbleFlashElement,
+    3,
+    { scale: 1, opacity: 1 },
+    { scale: 3, opacity: 0, repeat: -1 },
+);
