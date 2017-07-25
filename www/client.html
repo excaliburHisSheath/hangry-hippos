@@ -45,7 +45,7 @@
             <h1>HungryHipp.us</h1>
 
             <div id="game-screen" class="screen" v-if="isPlaying">
-                <div id="hippo-name">{{ hippoName }}</div>
+                <div id="name" class="hippo-name">{{ hippoName }}</div>
                 <div id="tap-text">Tap anywhere!</div>
                 <transition name="score">
                     <div id="score-text" :key="score">{{ score }}</div>
@@ -53,7 +53,10 @@
             </div>
 
             <div id="lose-screen" class="screen" v-if="!isPlaying">
-                <h2 id="game-over-text">Game Over</h2>
+                <h2>Game Over</h2>
+                <transition appear name="skull">
+                    <img id="game-over-skull" src="assets/skull.png">
+                </transition>
                 <div id="game-over-message">Your hippo <span class="hippo-name">{{ hippoName }}</span> ate a poison marble and died.</div>
                 <div id="final-score-text">Your final score is {{ score }}.</div>
                 <button v-on:click.stop="reload">Play Again</button>
@@ -70,12 +73,14 @@
                 </div>
             </div>
 
-            <div id="hippo-root" v-if="isPlaying">
-                <img class="head" src="assets/hippo.png">
-                <transition name="crown">
-                    <img class="crown" src="assets/crown.png" v-if="hasCrown">
-                </transition>
-            </div>
+            <transition appear name="hippo">
+                <div id="hippo-root" v-if="isPlaying">
+                    <img class="head" src="assets/hippo.png">
+                    <transition name="crown">
+                        <img class="crown" src="assets/crown.png" v-if="hasCrown">
+                    </transition>
+                </div>
+            </transition>
         </div>
 
         <!-- Load script for the client. -->

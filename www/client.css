@@ -22,8 +22,16 @@ body {
     text-align: center;
 }
 
+button {
+    font-family: 'Baloo', cursive;
+}
+
 h1 {
     font-size: 200%;
+}
+
+h2 {
+    font-size: 170%;
 }
 
 #app-root {
@@ -34,15 +42,23 @@ h1 {
     padding: 20px;
 }
 
-@media all and (orientation: portrait) {
+@media (orientation: portrait) {
     * {
         font-size: 5vw;
     }
+
+    #game-over-skull {
+        height: 70vw;
+    }
 }
 
-@media all and (orientation: landscape) {
+@media (orientation: landscape) {
     * {
         font-size: 5vh;
+    }
+
+    #game-over-skull {
+        height: 70vh;
     }
 }
 
@@ -55,8 +71,11 @@ h1 {
     width: calc(100% - 40px);
 }
 
-#hippo-name {
+.hippo-name {
     color: #bc00a6;
+}
+
+#name {
     font-size: 170%
 }
 
@@ -73,6 +92,10 @@ h1 {
     font-size: 150%;
 }
 
+#lose-screen h2 {
+    margin: 0;
+}
+
 #game-over-text {
     font-size: 200%;
 }
@@ -81,14 +104,21 @@ h1 {
     padding-bottom: 30px;
 }
 
+#game-over-skull {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -10;
+}
+
 button {
     background-color: #bc00a6;
     color: white;
     border-style: none;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 15px;
 }
-
 
 #nose-goes-overlay {
     width: 100vw;
@@ -144,7 +174,7 @@ button {
 /* Score animation configuration. */
 /* ============================== */
 
-#score-text {
+.score-enter-active {
     transition: all 0.2s;
 }
 
@@ -155,6 +185,18 @@ button {
 
 .score-leave-active {
     display: none;
+}
+
+/* Hippo head animation configuration. */
+/* =================================== */
+
+.hippo-leave-active {
+    transition: all 1s;
+}
+
+#hippo-root.hippo-leave-to {
+    opacity: 0;
+    transform: translate(-50%, 100%);
 }
 
 /* Crown animation configuration. */
@@ -176,4 +218,16 @@ button {
 .crown-leave-to {
     opacity: 0;
     transform: translate(-50%, 50%);
+}
+
+/* Skull animation configuration. */
+/* ============================== */
+
+.skull-enter-active {
+    transition: all 3s;
+}
+
+#game-over-skull.skull-enter {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
 }
