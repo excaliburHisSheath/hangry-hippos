@@ -281,6 +281,7 @@ pub fn start_game_loop(
                                     start_time: next_start_time,
                                     end_time: next_start_time + nose_goes_duration,
                                     remaining_players,
+                                    bonus_winner: None,
                                 }
                             } else {
                                 // There aren't enough players to run the nose-goes event. Delay until
@@ -293,9 +294,9 @@ pub fn start_game_loop(
                         }
                     }
 
-                    NoseGoes::InProgress { start_time, end_time, remaining_players } => {
+                    NoseGoes::InProgress { start_time, end_time, remaining_players, bonus_winner } => {
                         if now > end_time || remaining_players.len() == 1 {
-                            // Remove the player from the player map.
+                            // Remove all players who haven't tapped from the players map.
                             let mut players = players.write().expect("Player map was poisoned!");
                             for loser in &remaining_players {
                                 let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
@@ -338,7 +339,12 @@ pub fn start_game_loop(
 
                             NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
                         } else {
-                            NoseGoes::InProgress { start_time, end_time, remaining_players }
+                            NoseGoes::InProgress {
+                                start_time,
+                                end_time,
+                                remaining_players,
+                                bonus_winner,
+                            }
                         }
                     }
                 };
@@ -360,6 +366,7 @@ pub enum NoseGoes {
         start_time: Instant,
         end_time: Instant,
         remaining_players: HashSet<PlayerId>,
+        bonus_winner: Option<PlayerId>,
     }
 }
 

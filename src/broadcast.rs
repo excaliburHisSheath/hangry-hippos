@@ -50,6 +50,7 @@ pub enum HostBroadcast {
     EndNoseGoes {
         /// The players that have been knocked out. Will always have at least one member.
         losers: HashSet<PlayerId>,
+        bonus_winner: Option<(PlayerId, usize)>
     },
 
     /// A new player has taken the lead.
@@ -62,12 +63,14 @@ pub enum HostBroadcast {
 #[derive(Debug, Serialize)]
 pub enum PlayerBroadcast {
     /// A nose-goes event has begun, and the player should be prompted to participate.
-    BeginNoseGoes,
+    BeginNoseGoes {}
 
     /// A nose-goes event has finished, and one or more playeres have been knocked out.
     ///
     /// One `PlayerLose` event will also be sent for each knocked-out player.
-    EndNoseGoes,
+    EndNoseGoes {
+        bonus_winner: Option<(PlayerId, usize)>
+    },
 
     /// A player has lost the game and has been removed.
     PlayerLose {
