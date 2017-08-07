@@ -2,6 +2,7 @@ use broadcast::*;
 use rand::{self, Rng};
 use rocket::request::FromParam;
 use serde::*;
+use std::cmp;
 use std::collections::{ HashMap, HashSet };
 use std::mem;
 use std::str::FromStr;
@@ -275,7 +276,7 @@ pub fn start_game_loop(
                                     duration: nose_goes_duration,
                                     players: remaining_players.clone(),
                                 });
-                                player_broadcaster.send(PlayerBroadcast::BeginNoseGoes);
+                                player_broadcaster.send(PlayerBroadcast::BeginNoseGoes {});
 
                                 NoseGoes::InProgress {
                                     start_time: next_start_time,
@@ -298,13 +299,29 @@ pub fn start_game_loop(
                         if now > end_time || remaining_players.len() == 1 {
                             // Remove all players who haven't tapped from the players map.
                             let mut players = players.write().expect("Player map was poisoned!");
+                            let mut bonus = 0;
+                            let min_bonus = remaining_players.len() * 100;
                             for loser in &remaining_players {
                                 let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
                                 player_broadcaster.send(PlayerBroadcast::PlayerLose {
                                     id: *loser,
                                     score: loser_info.score,
                                 });
+
+                                bonus += loser_info.score;
                             }
+
+                            let bonus = cmp::max(bonus, min_bonus);
+
+                            // Apply bonus points to the bonus winner, if any.
+                            let bonus_winner = match bonus_winner {
+                                Some(bonus_winner) => {
+                                    let bonus_winner = players.get_mut(&bonus_winner).expect("Bonus winner wasn't in players map");
+                                    bonus_winner.score += bonus;
+                                    Some((bonus_winner.id, bonus_winner.score))
+                                },
+                                None => None,
+                            };
 
                             // Recalculate the new winner after all losers have been removed.
                             let mut winner = winner.lock().expect("Winner was poisoned!");
@@ -334,8 +351,11 @@ pub fn start_game_loop(
                             *winner = new_winner;
 
                             // Broadcast player loss to players and hosts.
-                            host_broadcaster.send(HostBroadcast::EndNoseGoes { losers: remaining_players });
-                            player_broadcaster.send(PlayerBroadcast::EndNoseGoes);
+                            host_broadcaster.send(HostBroadcast::EndNoseGoes {
+                                losers: remaining_players,
+                                bonus_winner,
+                            });
+                            player_broadcaster.send(PlayerBroadcast::EndNoseGoes { bonus_winner });
 
                             NoseGoes::Inactive { next_start_time: end_time + nose_goes_interval }
                         } else {

@@ -77,15 +77,21 @@ socket.onmessage = function(event) {
     // TODO: Do some kind of validation.
     let payload = JSON.parse(event.data);
 
-    if (payload === 'BeginNoseGoes') {
+    if (payload['BeginNoseGoes']) {
         app.noseGoes.isActive = true;
         app.noseGoes.showMarble = true;
         app.noseGoes.marbleX = Math.random() * 0.5 + 0.25;
         app.noseGoes.marbleY = Math.random() * 0.5 + 0.25;
 
         window.navigator.vibrate([300, 30, 500, 30, 300]);
-    } else if (payload === 'EndNoseGoes') {
+    } else if (payload['EndNoseGoes']) {
         // TODO: Do some kind of animation when the player is the one who lost?
+        let event = payload['EndNoseGoes'];
+        console.log(event);
+        if (event.bonus_winner != null && event.bonus_winner[0] === app.id) {
+            app.score = event.bonus_winner[1];
+        }
+
         app.noseGoes.isActive = false;
     } else if (payload['HippoEat']) {
         let event = payload['HippoEat'];

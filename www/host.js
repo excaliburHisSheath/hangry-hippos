@@ -113,6 +113,11 @@ socket.onmessage = (event) => {
         for (let loser of info.losers) {
             removePlayer(loser);
         }
+
+        if (info.bonus_winner != null) {
+            let bonusWinner = app.hippoMap[info.bonus_winner[0]];
+            bonusWinner.player.score = info.bonus_winner[1];
+        }
     } else if (payload['UpdateWinner']) {
         for (let key in app.hippoMap) {
             let hippo = app.hippoMap[key];
