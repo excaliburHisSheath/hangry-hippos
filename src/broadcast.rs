@@ -46,6 +46,11 @@ pub enum HostBroadcast {
         players: HashSet<PlayerId>,
     },
 
+    /// The first player to tap during a nose-goes event has been selected to earn bonus points.
+    BonusWinner {
+        id: PlayerId,
+    },
+
     /// A nose-goes event has ended, and one or more players have been knocked out.
     EndNoseGoes {
         /// The players that have been knocked out. Will always have at least one member.
@@ -69,6 +74,11 @@ pub enum HostBroadcast {
 pub enum PlayerBroadcast {
     /// A nose-goes event has begun, and the player should be prompted to participate.
     BeginNoseGoes {},
+
+    /// The first player to tap during a nose-goes event has been selected to earn bonus points.
+    BonusWinner {
+        id: PlayerId,
+    },
 
     /// A nose-goes event has finished, and one or more playeres have been knocked out.
     ///

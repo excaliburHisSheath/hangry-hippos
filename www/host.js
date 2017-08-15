@@ -53,6 +53,11 @@ Vue.component('hippo-head', {
         <transition name="poison">
             <div class="poison-pill" :id="'poison-' + hippo.player.id" v-if="hippo.isDead"></div>
         </transition>
+        <transition name="bonus-text">
+            <div id="bonus-text-root" v-if="hippo.wonBonus">
+                <div id="bonus-text">Speedy Bonus!</div>
+            </div>
+        </transition>
     </div>
     `,
 });
@@ -60,7 +65,7 @@ Vue.component('hippo-head', {
 // Helpers to allow us to place hippos in clockwise order. By cycling through this array, we choose
 // which sides the hippos are added to and in which proportion. We choose to add twice as many
 // hippos to the top and bottom of the screen as to the sides, which looks better on wide-screen
-// displays (which is moslty what we're supporting at this point).
+// displays (which is mostly what we're supporting at this point).
 const SIDES = [
     { array: app.topHippos, side: TOP_SIDE },
     { array: app.topHippos, side: TOP_SIDE },
@@ -103,9 +108,19 @@ socket.onmessage = (event) => {
         let to = { repeat: 1, yoyo: true, overwrite: 'none' };
         to[sideName] = '100px';
 
-        TweenMax.fromTo(element, .2, from, to);
+        TweenMax.fromTo(element, 0.2, from, to);
     } else if (payload['BeginNoseGoes']) {
         app.noseGoes.isActive = true;
+    } else if (payload['BonusWinner']) {
+        let event = payload['BonusWinner'];
+        let bonusWinner = app.hippoMap[event.id];
+        bonusWinner.wonBonus = true;
+
+        // Start the animation once the element has been added to the DOM.
+        Vue.nextTick(() => {
+            let element = document.getElementById('bonus-text');
+            TweenMax.to(element, 0.5, { scale: 1.2, repeat: -1, yoyo: true });
+        });
     } else if (payload['EndNoseGoes']) {
         app.noseGoes.isActive = false;
 
@@ -117,6 +132,7 @@ socket.onmessage = (event) => {
         if (info.bonus_winner != null) {
             let bonusWinner = app.hippoMap[info.bonus_winner[0]];
             bonusWinner.player.score = info.bonus_winner[1];
+            bonusWinner.wonBonus = false;
         }
     } else if (payload['UpdateWinner']) {
         for (let key in app.hippoMap) {
@@ -159,6 +175,7 @@ function addPlayer(player) {
         side: side,
         isDead: false,
         hasCrown: player.has_crown,
+        wonBonus: false,
     };
 
     // Add the hippo to the hippo map and its side of the screen.

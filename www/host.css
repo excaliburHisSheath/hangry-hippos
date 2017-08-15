@@ -77,6 +77,9 @@ body {
 }
 
 .hippo-head-root {
+    /* Use relative positioning so that we can absolutely position children. */
+    position: relative;
+
     /* We use flexbox to position the label on the outside and the hippo head on the inside. */
     display: flex;
 
@@ -168,6 +171,25 @@ body {
     background-size: 60px;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+#bonus-text-root {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#bonus-text {
+    position: relative;
+
+    font-size: 200%;
+    white-space: nowrap;
+
+    color: #bc00a6;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 0 10px;
 }
 
 /* Top side styles. */
@@ -319,4 +341,16 @@ body {
 .crown-leave-to {
     opacity: 0;
     transform: translate(-50%, 50%);
+}
+
+/* Bonus text animation configuration. */
+/* =================================== */
+
+.bonus-text-enter-active {
+    transition: all 0.3s;
+}
+
+#bonus-text-root.bonus-text-enter {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(180deg) scale(3);
 }

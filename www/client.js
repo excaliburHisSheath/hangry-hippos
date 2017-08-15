@@ -84,6 +84,11 @@ socket.onmessage = function(event) {
         app.noseGoes.marbleY = Math.random() * 0.5 + 0.25;
 
         window.navigator.vibrate([300, 30, 500, 30, 300]);
+    } else if (payload['BonusWinner']) {
+        let event = payload['BonusWinner'];
+        if (event.id === app.id) {
+            // TODO: Show that we're the bonus winner.
+        }
     } else if (payload['EndNoseGoes']) {
         // TODO: Do some kind of animation when the player is the one who lost?
         let event = payload['EndNoseGoes'];
