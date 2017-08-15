@@ -300,7 +300,6 @@ pub fn start_game_loop(
                             // Remove all players who haven't tapped from the players map.
                             let mut players = players.write().expect("Player map was poisoned!");
                             let mut bonus = 0;
-                            let min_bonus = remaining_players.len() * 100;
                             for loser in &remaining_players {
                                 let loser_info = players.remove(&loser).expect("Loser wasn't in player map");
                                 player_broadcaster.send(PlayerBroadcast::PlayerLose {
@@ -308,10 +307,8 @@ pub fn start_game_loop(
                                     score: loser_info.score,
                                 });
 
-                                bonus += loser_info.score;
+                                bonus += cmp::max(loser_info.score, 100);
                             }
-
-                            let bonus = cmp::max(bonus, min_bonus);
 
                             // Apply bonus points to the bonus winner, if any.
                             let bonus_winner = match bonus_winner {
