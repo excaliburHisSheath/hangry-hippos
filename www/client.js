@@ -124,9 +124,16 @@ socket.onerror = function(error) {
     console.error(error);
 };
 
-socket.onclose = function(event) {
-    // TODO: Re-open the connection, if possible.
-    console.error('Socket closed I guess: ', event);
+socket.onclose = (event) => {
+    function tryReconnect() {
+        get(
+            '/api/players',
+            () => { window.location.reload(true); },
+            () => { setTimeout(tryReconnect, 1000); },
+        );
+    }
+
+    tryReconnect();
 };
 
 function registerPlayer() {

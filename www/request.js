@@ -10,6 +10,8 @@ function get(endpoint, onResponse, onError) {
             onError(request.status);
         }
     });
+
+    request.addEventListener('error', onError);
     request.open('GET', endpoint);
     request.send();
 }

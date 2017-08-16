@@ -146,9 +146,19 @@ socket.onmessage = (event) => {
         console.error('Unrecognized host event:', payload);
     }
 };
+
 socket.onclose = (event) => {
-    console.error('Socket closed:', event);
+    function tryReconnect() {
+        get(
+            '/api/players',
+            () => { window.location.reload(true); },
+            () => { setTimeout(tryReconnect, 1000); },
+        );
+    }
+
+    tryReconnect();
 };
+
 
 // When we first boot up we need to get the current list of players.
 get('/api/players', response => {
