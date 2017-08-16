@@ -10,8 +10,8 @@ body {
 
     font-family: 'Baloo', sans-serif;
 
-    background-color: #61a498;
-    background-image: url('assets/host_background.jpg');
+    background-color: #0d879f;
+    background: linear-gradient(141deg, #186a9e 0%, #0d879f 51%, #00ada0 75%);
 }
 
 #vue-root {
@@ -186,8 +186,9 @@ body {
     font-size: 200%;
     white-space: nowrap;
 
-    color: #bc00a6;
-    background-color: rgba(255, 255, 255, 0.9);
+    color: #eab24a;
+
+    background-color: #09381f;
     border-radius: 10px;
     padding: 0 10px;
 }
@@ -237,24 +238,29 @@ body {
 
 #attract-message {
     font-size: 250%;
+    color: white;
+    text-shadow: 5px 5px #09381f;
 }
 
 #site-address {
     font-size: 150%;
-    color: #bc00a6;
+    color: #eab24a;
 }
 
 #nose-goes {
     font-size: 600%;
-    color: red;
+    color: #eab24a;
+    text-shadow: 5px 5px #09381f;
 }
 
 #death-message {
     font-size: 250%;
+    color: white;
+    text-shadow: 5px 5px #09381f;
 }
 
 #death-message .name {
-    color: red;
+    color: #eab24a;
     font-size: 150%;
 }
 

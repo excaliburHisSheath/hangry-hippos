@@ -5,8 +5,8 @@ body {
     margin: 0;
     overflow: hidden;
 
-    background-color: #61a498;
-    background-image: url('assets/host_background.jpg');
+    background-color: #0d879f;
+    background: linear-gradient(141deg, #186a9e 0%, #0d879f 51%, #00ada0 75%);
 
     /* Disable text selection so the user doesn't accidentally highlight text while tapping. */
     -webkit-touch-callout: none; /* iOS Safari */
@@ -20,6 +20,7 @@ body {
 
     font-family: 'Baloo', cursive;
     text-align: center;
+    color: white;
 }
 
 button {
@@ -28,10 +29,16 @@ button {
 
 h1 {
     font-size: 200%;
+
+    color: #eab24a;
+    text-shadow: 5px 5px #09381f;
 }
 
 h2 {
     font-size: 170%;
+
+    color: #eab24a;
+    text-shadow: 5px 5px #09381f;
 }
 
 #app-root {
@@ -82,7 +89,8 @@ h2 {
 }
 
 .hippo-name {
-    color: #bc00a6;
+    color: #eab24a;
+    text-shadow: 5px 5px #09381f;
 }
 
 #name {
@@ -91,10 +99,12 @@ h2 {
 
 #tap-text {
     font-size: 200%;
+    text-shadow: 5px 5px #09381f;
 }
 
 #score-text {
-    color: #bc00a6;
+    color: #eab24a;
+    text-shadow: 5px 5px #09381f;
     font-size: 170%;
 }
 
